@@ -239,6 +239,7 @@ export default function Navbar() {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
   const actions = [
@@ -247,25 +248,63 @@ export default function Navbar() {
     { icon: ShoppingBag, label: 'Cart', to: '/cart', count: totals.count },
   ]
 
+  // Neeche scroll = chhupao, upar scroll = dikhao
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    onScroll()
+    let lastY = window.scrollY
+    let ticking = false
+
+    const update = () => {
+      const y = window.scrollY
+      const diff = y - lastY
+
+      setScrolled(y > 10)
+
+      if (y < 120) {
+        setHidden(false) // page ke upar hamesha dikhe
+      } else if (diff > 6) {
+        setHidden(true) // neeche scroll
+      } else if (diff < -6) {
+        setHidden(false) // upar scroll
+      }
+
+      if (Math.abs(diff) > 6) lastY = y
+      ticking = false
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        requestAnimationFrame(update)
+      }
+    }
+
+    update()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => setMenuOpen(false), [pathname])
+  // Page badalne par menu band aur navbar wapas dikhe
+  useEffect(() => {
+    setMenuOpen(false)
+    setHidden(false)
+  }, [pathname])
+
+  const isHidden = hidden && !menuOpen
 
   return (
     <>
       <header
-        className={`sticky top-0 z-50 text-bone transition-all duration-300 ${
-          scrolled ? 'bg-ink/95 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-md' : 'bg-ink'
-        }`}
+        className={`sticky top-0 z-50 text-bone transition-[transform,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          isHidden ? '-translate-y-full' : 'translate-y-0'
+        } ${scrolled ? 'bg-ink/95 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-md' : 'bg-ink'}`}
       >
         <Container className="flex h-[72px] items-center gap-6 lg:gap-10">
           {/* Mobile menu button */}
-          <button onClick={() => setMenuOpen(true)} aria-label="Open menu" className="-ml-1 p-1 text-bone transition-colors hover:text-gold-light lg:hidden">
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            className="-ml-1 p-1 text-bone transition-colors hover:text-gold-light lg:hidden"
+          >
             <Menu size={22} strokeWidth={1.6} />
           </button>
 
