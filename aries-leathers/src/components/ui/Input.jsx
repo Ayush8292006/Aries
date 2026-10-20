@@ -36,7 +36,7 @@ export default function Input({ label, icon: Icon, error, type = 'text', classNa
           type={isPassword && show ? 'text' : type}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : undefined}
-          className="h-full w-full bg-transparent text-sm text-ink outline-none placeholder:text-muted/70"
+                    className="h-full w-full bg-transparent text-base text-ink outline-none placeholder:text-muted/70 sm:text-sm"
           {...props}
         />
         {isPassword && (

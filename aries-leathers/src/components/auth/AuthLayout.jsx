@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react'
 import { Globe2, PackageCheck, Scissors } from 'lucide-react'
 import logo from '../../assets/logo.png'
@@ -16,8 +16,22 @@ const PERKS = [
   { icon: PackageCheck, text: 'Save favourites and track every order' },
 ]
 
-/** Mouse ke saath halka 3D tilt + chamak */
+/** Sirf mouse wale device par true (phone/tablet par false) */
+function useCanHover() {
+  const [can, setCan] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    setCan(mq.matches)
+    const onChange = (e) => setCan(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return can
+}
+
+/** Mouse ke saath halka 3D tilt + chamak (phone par band) */
 function TiltCard({ children }) {
+  const canHover = useCanHover()
   const ref = useRef(null)
   const mx = useMotionValue(0)
   const my = useMotionValue(0)
@@ -26,6 +40,8 @@ function TiltCard({ children }) {
   const gx = useTransform(mx, [-0.5, 0.5], [0, 100])
   const gy = useTransform(my, [-0.5, 0.5], [0, 100])
   const glare = useMotionTemplate`radial-gradient(600px circle at ${gx}% ${gy}%, rgba(255,255,255,0.35), transparent 45%)`
+
+  if (!canHover) return <div className="relative">{children}</div>
 
   const onMove = (e) => {
     const r = ref.current.getBoundingClientRect()
@@ -71,11 +87,36 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
       >
         <SmartImage src={HOME_IMAGES.auth} alt="" label="Aries Leathers" className="h-full w-full" />
       </motion.div>
-      <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-r from-ink-deep via-ink-deep/90 to-ink-deep/55" />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-b from-ink-deep/80 via-ink-deep/90 to-ink-deep lg:bg-linear-to-r lg:from-ink-deep lg:via-ink-deep/90 lg:to-ink-deep/55" />
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_80%_20%,rgba(176,141,87,0.18),transparent_55%)]" />
 
-      <Container className="grid min-h-[calc(100svh-7.25rem)] items-center gap-12 py-12 lg:grid-cols-2 lg:gap-16 lg:py-16">
-        {/* ===== Left: brand story ===== */}
+      <Container className="grid items-center gap-8 py-8 sm:py-12 lg:min-h-[calc(100svh-7.25rem)] lg:grid-cols-2 lg:gap-16 lg:py-16">
+        {/* ===== Phone / tablet: chhota brand intro ===== */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="text-center text-bone lg:hidden"
+        >
+          <p className="text-[10px] font-medium uppercase tracking-[0.35em] text-gold-light">Aries Leathers · Since 1992</p>
+          <p className="mt-3 font-display text-3xl leading-tight sm:text-4xl">
+            Leather that remembers <em className="text-gold-light">every journey.</em>
+          </p>
+          <div className="mt-4 flex justify-center gap-2">
+            {FLAGS.map((c, i) => (
+              <motion.span
+                key={c}
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.2, ease: 'easeInOut' }}
+                className="inline-block"
+              >
+                <Flag code={c} />
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ===== Desktop: brand story ===== */}
         <div className="hidden text-bone lg:block">
           <motion.p
             initial={{ opacity: 0, x: -20 }}
@@ -147,32 +188,33 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
           </motion.div>
         </div>
 
-        {/* ===== Right: form card ===== */}
+        {/* ===== Form card ===== */}
         <div style={{ perspective: 1400 }}>
           <motion.div
-            initial={{ opacity: 0, rotateY: -28, x: 80, scale: 0.92 }}
-            animate={{ opacity: 1, rotateY: 0, x: 0, scale: 1 }}
-            transition={{ duration: 1.1, delay: 0.15, ease: EASE }}
+            initial={{ opacity: 0, y: 50, rotateX: 14, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+            transition={{ duration: 1, delay: 0.15, ease: EASE }}
+            style={{ transformOrigin: 'top center' }}
             className="mx-auto w-full max-w-lg"
           >
             <TiltCard>
-              <div className="relative overflow-hidden border border-gold/30 bg-ivory px-6 py-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] sm:px-12 sm:py-12">
-                {/* Upar animated line */}
-                <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 1, delay: 0.8, ease: EASE }}
-                  className="absolute inset-x-0 top-0 h-[3px] origin-left bg-linear-to-r from-oxblood via-gold to-oxblood"
-                />
-                {/* Kone mein ghoomta halka logo */}
-                <motion.img
-                  src={logo}
-                  alt=""
-                  aria-hidden
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-                  className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 opacity-[0.05]"
-                />
+              <div className="relative border border-gold/30 bg-ivory px-5 py-8 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] sm:px-10 sm:py-10 lg:px-12 lg:py-12 lg:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)]">
+                {/* Decorations — alag layer, taaki dropdown na kate */}
+                <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <motion.span
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 1, delay: 0.8, ease: EASE }}
+                    className="absolute inset-x-0 top-0 h-[3px] origin-left bg-linear-to-r from-oxblood via-gold to-oxblood"
+                  />
+                  <motion.img
+                    src={logo}
+                    alt=""
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                    className="absolute -right-16 -top-16 h-44 w-44 opacity-[0.05] sm:-right-20 sm:-top-20 sm:h-64 sm:w-64"
+                  />
+                </div>
 
                 <div className="relative">
                   <motion.img
@@ -181,18 +223,18 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
                     initial={{ scale: 0, rotate: -120 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.6 }}
-                    className="h-12 w-12"
+                    className="hidden h-12 w-12 lg:block"
                   />
 
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="mt-6 text-[11px] font-medium uppercase tracking-[0.35em] text-oxblood"
+                    className="text-[11px] font-medium uppercase tracking-[0.35em] text-oxblood lg:mt-6"
                   >
                     {eyebrow}
                   </motion.p>
-                  <h1 className="mt-3 font-display text-4xl tracking-tight text-ink md:text-5xl">
+                  <h1 className="mt-2 font-display text-3xl tracking-tight text-ink sm:mt-3 sm:text-4xl md:text-5xl">
                     <SplitReveal text={title} />
                   </h1>
                   {subtitle && (
@@ -200,7 +242,7 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.9 }}
-                      className="mt-3 text-sm text-muted"
+                      className="mt-2 text-sm text-muted sm:mt-3"
                     >
                       {subtitle}
                     </motion.p>
@@ -210,7 +252,7 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.9, ease: EASE }}
-                    className="mt-8"
+                    className="mt-6 sm:mt-8"
                   >
                     {children}
                   </motion.div>
@@ -220,7 +262,7 @@ export default function AuthLayout({ eyebrow, title, subtitle, children, footer 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1.2 }}
-                      className="mt-8 border-t border-line pt-6 text-center text-sm text-muted"
+                      className="mt-6 border-t border-line pt-5 text-center text-sm text-muted sm:mt-8 sm:pt-6"
                     >
                       {footer}
                     </motion.div>
