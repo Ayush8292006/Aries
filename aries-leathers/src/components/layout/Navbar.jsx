@@ -29,9 +29,13 @@ function SearchBox({ className = '', onDone }) {
     <form
       onSubmit={submit}
       role="search"
-      className={`flex h-10 items-center gap-2 border border-line bg-cream px-3 transition-colors focus-within:border-ink focus-within:bg-white ${className}`}
+      className={`group flex h-10 items-center gap-2 rounded-full border border-line bg-cream px-4 transition-all duration-300 hover:border-ink/40 focus-within:border-ink focus-within:bg-white focus-within:shadow-[0_6px_20px_rgba(22,20,18,0.08)] ${className}`}
     >
-      <Search size={16} strokeWidth={1.75} className="shrink-0 text-muted" />
+      <Search
+        size={16}
+        strokeWidth={1.75}
+        className="shrink-0 text-muted transition-all duration-300 group-hover:text-ink group-focus-within:scale-110 group-focus-within:text-oxblood"
+      />
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
@@ -50,19 +54,78 @@ function Action({ icon: Icon, label, to, count = 0 }) {
       to={to}
       aria-label={count ? `${label} (${count})` : label}
       className={({ isActive }) =>
-        `group flex flex-col items-center gap-1 px-1 transition-colors ${isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'}`
+        `group flex flex-col items-center gap-0.5 px-1 transition-colors duration-300 ${isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'}`
       }
     >
-      <span className="relative">
-        <Icon size={20} strokeWidth={1.6} />
+      <span className="relative grid h-9 w-9 place-items-center">
+        <span className="absolute inset-0 scale-0 rounded-full bg-oxblood/10 transition-transform duration-300 ease-out group-hover:scale-100" />
+        <Icon
+          size={20}
+          strokeWidth={1.6}
+          className="relative transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-110"
+        />
         {count > 0 && (
-          <span className="absolute -right-2.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-oxblood px-1 text-[10px] font-semibold leading-none text-bone">
+          <motion.span
+            key={count}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+            className="absolute -right-0.5 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-oxblood px-1 text-[10px] font-semibold leading-none text-bone"
+          >
             {count > 9 ? '9+' : count}
-          </span>
+          </motion.span>
         )}
       </span>
       <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>
     </NavLink>
+  )
+}
+
+/* ===== Desktop links with sliding hover pill ===== */
+function NavLinks() {
+  const [hovered, setHovered] = useState(null)
+  const { pathname } = useLocation()
+
+  return (
+    <nav onMouseLeave={() => setHovered(null)} className="hidden items-center gap-1 lg:flex" aria-label="Main">
+      {NAV_LINKS.map((link) => {
+        const isActive = link.to === '/' ? pathname === '/' : pathname.startsWith(link.to)
+        const isHover = hovered === link.to
+        return (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.to === '/'}
+            onMouseEnter={() => setHovered(link.to)}
+            onFocus={() => setHovered(link.to)}
+            onBlur={() => setHovered(null)}
+            className="relative px-4 py-2.5 text-[13px] font-semibold uppercase tracking-wider"
+          >
+            {isHover && (
+              <motion.span
+                layoutId="nav-hover-pill"
+                className="absolute inset-0 rounded-full bg-ink"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span
+              className={`relative z-10 transition-colors duration-300 ${
+                isHover ? 'text-bone' : isActive ? 'text-oxblood' : 'text-ink'
+              }`}
+            >
+              {link.label}
+            </span>
+            {isActive && (
+              <motion.span
+                layoutId="nav-active-dot"
+                className="absolute -bottom-1.5 left-0 right-0 mx-auto h-1.5 w-1.5 rounded-full bg-oxblood"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+          </NavLink>
+        )
+      })}
+    </nav>
   )
 }
 
@@ -80,7 +143,7 @@ function MobileMenu({ open, onClose, actions }) {
       {open && (
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <motion.div
-            className="absolute inset-0 bg-ink/40"
+            className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -91,34 +154,40 @@ function MobileMenu({ open, onClose, actions }) {
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ duration: 0.35, ease: EASE }}
+            transition={{ duration: 0.4, ease: EASE }}
           >
             <div className="flex h-16 items-center justify-between border-b border-line px-5">
               <Brand compact onClick={onClose} />
-              <button onClick={onClose} aria-label="Close menu" className="p-1 text-ink">
+              <button onClick={onClose} aria-label="Close menu" className="p-1 text-ink transition-transform duration-300 hover:rotate-90">
                 <X size={22} strokeWidth={1.5} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto" data-lenis-prevent>
-              <nav className="border-b border-line">
+              <motion.nav
+                className="border-b border-line"
+                initial="hidden"
+                animate="show"
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } } }}
+              >
                 {NAV_LINKS.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    end={link.to === '/'}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `flex items-center justify-between border-b border-line px-5 py-4 text-sm font-semibold uppercase tracking-wider last:border-b-0 ${
-                        isActive ? 'text-oxblood' : 'text-ink'
-                      }`
-                    }
-                  >
-                    {link.label}
-                    <ChevronRight size={16} className="text-muted" />
-                  </NavLink>
+                  <motion.div key={link.to} variants={{ hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0 } }}>
+                    <NavLink
+                      to={link.to}
+                      end={link.to === '/'}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        `group flex items-center justify-between border-b border-line px-5 py-4 text-sm font-semibold uppercase tracking-wider transition-colors hover:bg-cream ${
+                          isActive ? 'text-oxblood' : 'text-ink'
+                        }`
+                      }
+                    >
+                      {link.label}
+                      <ChevronRight size={16} className="text-muted transition-transform group-hover:translate-x-1" />
+                    </NavLink>
+                  </motion.div>
                 ))}
-              </nav>
+              </motion.nav>
 
               <p className="px-5 pb-2 pt-6 text-[11px] font-semibold uppercase tracking-wider text-muted">Categories</p>
               {CATEGORIES.map((c) => (
@@ -126,10 +195,10 @@ function MobileMenu({ open, onClose, actions }) {
                   key={c.slug}
                   to={`/products?category=${c.slug}`}
                   onClick={onClose}
-                  className="flex items-center justify-between px-5 py-3 text-sm text-ink hover:text-oxblood"
+                  className="group flex items-center justify-between px-5 py-3 text-sm text-ink transition-colors hover:text-oxblood"
                 >
                   {c.name}
-                  <ChevronRight size={14} className="text-muted" />
+                  <ChevronRight size={14} className="text-muted transition-transform group-hover:translate-x-1" />
                 </Link>
               ))}
             </div>
@@ -137,7 +206,7 @@ function MobileMenu({ open, onClose, actions }) {
             <div className="border-t border-line px-5 py-4">
               <div className="flex justify-around">
                 {actions.map((a) => (
-                  <Link key={a.label} to={a.to} onClick={onClose} className="flex flex-col items-center gap-1 text-ink">
+                  <Link key={a.label} to={a.to} onClick={onClose} className="flex flex-col items-center gap-1 text-ink hover:text-oxblood">
                     <a.icon size={20} strokeWidth={1.6} />
                     <span className="text-[10px] font-semibold uppercase">{a.label}</span>
                   </Link>
@@ -180,12 +249,15 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className={`sticky top-0 z-50 border-b border-line bg-bone transition-shadow duration-300 ${
-          scrolled ? 'shadow-[0_4px_16px_rgba(22,20,18,0.08)]' : ''
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className={`sticky top-0 z-50 border-b border-line transition-all duration-300 ${
+          scrolled ? 'bg-bone/90 shadow-[0_4px_16px_rgba(22,20,18,0.08)] backdrop-blur-md' : 'bg-bone'
         }`}
       >
-        <Container className="flex h-[72px] items-center gap-6 lg:gap-10">
+        <Container className="flex h-[72px] items-center gap-6 lg:gap-8">
           {/* Mobile menu button */}
           <button onClick={() => setMenuOpen(true)} aria-label="Open menu" className="-ml-1 p-1 text-ink lg:hidden">
             <Menu size={22} strokeWidth={1.6} />
@@ -195,30 +267,15 @@ export default function Navbar() {
           <Brand compact hideTextOnMobile />
 
           {/* Links */}
-          <nav className="hidden h-full items-stretch gap-8 lg:flex" aria-label="Main">
-            {NAV_LINKS.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.to === '/'}
-                className={({ isActive }) =>
-                  `relative flex items-center text-[13px] font-semibold uppercase tracking-wider transition-colors
-                   after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-oxblood after:transition-transform after:duration-300
-                   ${isActive ? 'text-oxblood after:scale-x-100' : 'text-ink after:scale-x-0 hover:text-oxblood hover:after:scale-x-100'}`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
+          <NavLinks />
 
           {/* Search (desktop/tablet) */}
           <SearchBox className="ml-auto hidden w-full max-w-sm md:flex" />
 
           {/* Country + actions */}
-          <div className="ml-auto flex items-center gap-4 md:ml-0 md:gap-5">
+          <div className="ml-auto flex items-center gap-4 md:ml-0 md:gap-4">
             <CountrySelect variant="compact" className="hidden md:block" />
-            <div className="hidden items-center gap-5 sm:flex">
+            <div className="hidden items-center gap-3 sm:flex">
               {actions.map((a) => (
                 <Action key={a.label} {...a} />
               ))}
@@ -234,7 +291,7 @@ export default function Navbar() {
         <Container className="pb-3 md:hidden">
           <SearchBox className="w-full" />
         </Container>
-      </header>
+      </motion.header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} actions={actions} />
     </>
