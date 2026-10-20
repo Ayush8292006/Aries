@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  /* ===== OXBLOOD & BONE ===== */
+  --color-bone: #EDE6DA;
+  --color-ivory: #F5F0E8;
+  --color-cream: #F8F4EE;
+  --color-stone: #D9CFC0;
+  --color-sand: #C9BBA6;
+  --color-blush: #E4DACB;
+
+  --color-ink: #161412;
+  --color-ink-deep: #0E0C0B;
+  --color-ink-light: #3A3532;
+
+  --color-oxblood: #6B1E22;
+  --color-oxblood-light: #8A2C30;
+  --color-oxblood-deep: #4E1316;
+
+  --color-charcoal: #1F1B19;
+    --color-muted: #5E564E;
+  --color-line: #D6CBBB;
+  --color-soft: #E6DED1;
+
+  --color-gold: #B08D57;
+  --color-gold-light: #D9C29A;
+  --color-gold-dark: #8A6A3A;
+  --color-offer: #8A2C30;
+
+  /* ===== Fonts ===== */
+    --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+
+  /* ===== Soft shadows ===== */
+  --shadow-card: 0 1px 2px rgb(22 20 18 / 0.04), 0 8px 24px -10px rgb(22 20 18 / 0.12);
+  --shadow-lift: 0 2px 6px rgb(22 20 18 / 0.05), 0 30px 60px -24px rgb(22 20 18 / 0.28);
+  --shadow-3d: 0 1px 1px rgb(22 20 18 / 0.04), 0 20px 40px -16px rgb(22 20 18 / 0.2), 0 60px 100px -40px rgb(22 20 18 / 0.3);
+  --shadow-press: 0 10px 22px -10px rgb(22 20 18 / 0.5);
+
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ===== Animations ===== */
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-fade-up: fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 60s linear infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes marquee-reverse {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+  }
+}
+
+body {
+  @apply bg-bone text-charcoal font-sans antialiased;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  @apply bg-oxblood text-bone;
+}
+
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-oxblood);
+  outline-offset: 2px;
+}
+
+/* ===== Lenis smooth scroll ===== */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bone); }
+::-webkit-scrollbar-thumb { background: var(--color-sand); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-oxblood); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Headings thode bhaari — Cormorant patla font hai */
+@layer base {
+  .font-display {
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+}
