@@ -19,7 +19,7 @@ export default function ProductCard({ p }) {
 
   return (
     <article className="group">
-      <TiltCard max={4} glare={false}>
+      <TiltCard max={9} >
         <div className="relative aspect-[4/5] overflow-hidden bg-stone">
           <Link to={`/products/${p.id}`} aria-label={p.name} className="absolute inset-0">
             <SmartImage
