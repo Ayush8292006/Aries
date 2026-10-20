@@ -11,20 +11,20 @@ import { useAuth } from '../../hooks/useAuth'
 
 const EASE = [0.22, 1, 0.36, 1]
 
-/* ===== Hover par text roll hota hai (upar jaata hai, neeche se oxblood aata hai) ===== */
+/* ===== Hover par text roll hota hai (upar jaata hai, neeche se gold aata hai) ===== */
 function RollText({ children, active = false }) {
   return (
     <span className="relative block overflow-hidden leading-[1.3]">
       <span
         className={`block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-full ${
-          active ? 'text-oxblood' : ''
+          active ? 'text-gold-light' : ''
         }`}
       >
         {children}
       </span>
       <span
         aria-hidden
-        className="absolute inset-0 block translate-y-full text-oxblood transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+        className="absolute inset-0 block translate-y-full text-gold-light transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
       >
         {children}
       </span>
@@ -50,21 +50,21 @@ function SearchBox({ className = '', onDone }) {
     <form
       onSubmit={submit}
       role="search"
-      className={`group relative flex h-10 items-center gap-2 border-b border-line px-1 transition-colors duration-300 hover:border-ink/40 ${className}`}
+      className={`group relative flex h-10 items-center gap-2 border-b border-bone/25 px-1 transition-colors duration-300 hover:border-bone/50 ${className}`}
     >
       <Search
         size={16}
         strokeWidth={1.75}
-        className="shrink-0 text-muted transition-colors duration-300 group-hover:text-ink group-focus-within:text-oxblood"
+        className="shrink-0 text-bone/60 transition-colors duration-300 group-hover:text-bone group-focus-within:text-gold-light"
       />
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search jackets, blazers and more"
         aria-label="Search products"
-        className="w-full bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
+        className="w-full bg-transparent text-base text-bone outline-none placeholder:text-bone/45 md:text-[13px]"
       />
-      <span className="pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-oxblood transition-transform duration-500 ease-out group-focus-within:scale-x-100" />
+      <span className="pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-gold transition-transform duration-500 ease-out group-focus-within:scale-x-100" />
     </form>
   )
 }
@@ -76,7 +76,9 @@ function Action({ icon: Icon, label, to, count = 0 }) {
       to={to}
       aria-label={count ? `${label} (${count})` : label}
       className={({ isActive }) =>
-        `group flex flex-col items-center gap-1 px-1 transition-colors duration-300 ${isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'}`
+        `group flex flex-col items-center gap-1 px-1 transition-colors duration-300 ${
+          isActive ? 'text-gold-light' : 'text-bone hover:text-gold-light'
+        }`
       }
     >
       {({ isActive }) => (
@@ -93,7 +95,7 @@ function Action({ icon: Icon, label, to, count = 0 }) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                className="absolute -right-2.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-oxblood px-1 text-[10px] font-semibold leading-none text-bone"
+                className="absolute -right-2.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[10px] font-bold leading-none text-ink"
               >
                 {count > 9 ? '9+' : count}
               </motion.span>
@@ -121,14 +123,12 @@ function NavLinks() {
             key={link.to}
             to={link.to}
             end={link.to === '/'}
-            className="group relative py-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink"
+            className="group relative py-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-bone"
           >
             <RollText active={isActive}>{link.label}</RollText>
             <span
-              className={`absolute inset-x-0 bottom-0 h-px bg-oxblood transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                isActive
-                  ? 'scale-x-100'
-                  : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+              className={`absolute inset-x-0 bottom-0 h-px bg-gold transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isActive ? 'scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
               }`}
             />
           </NavLink>
@@ -138,7 +138,7 @@ function NavLinks() {
   )
 }
 
-/* ===== Mobile drawer ===== */
+/* ===== Mobile drawer (halka rang) ===== */
 function MobileMenu({ open, onClose, actions }) {
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -152,7 +152,7 @@ function MobileMenu({ open, onClose, actions }) {
       {open && (
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <motion.div
-            className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-ink/50 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -165,9 +165,9 @@ function MobileMenu({ open, onClose, actions }) {
             exit={{ x: '-100%' }}
             transition={{ duration: 0.4, ease: EASE }}
           >
-            <div className="flex h-16 items-center justify-between border-b border-line px-5">
-              <Brand compact onClick={onClose} />
-              <button onClick={onClose} aria-label="Close menu" className="p-1 text-ink transition-transform duration-300 hover:rotate-90">
+            <div className="flex h-16 items-center justify-between bg-ink px-5">
+              <Brand compact dark onClick={onClose} />
+              <button onClick={onClose} aria-label="Close menu" className="p-1 text-bone transition-transform duration-300 hover:rotate-90">
                 <X size={22} strokeWidth={1.5} />
               </button>
             </div>
@@ -259,18 +259,18 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 border-b border-line transition-all duration-300 ${
-          scrolled ? 'bg-bone/90 shadow-[0_4px_16px_rgba(22,20,18,0.08)] backdrop-blur-md' : 'bg-bone'
+        className={`sticky top-0 z-50 text-bone transition-all duration-300 ${
+          scrolled ? 'bg-ink/95 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-md' : 'bg-ink'
         }`}
       >
         <Container className="flex h-[72px] items-center gap-6 lg:gap-10">
           {/* Mobile menu button */}
-          <button onClick={() => setMenuOpen(true)} aria-label="Open menu" className="-ml-1 p-1 text-ink lg:hidden">
+          <button onClick={() => setMenuOpen(true)} aria-label="Open menu" className="-ml-1 p-1 text-bone transition-colors hover:text-gold-light lg:hidden">
             <Menu size={22} strokeWidth={1.6} />
           </button>
 
           {/* Logo */}
-          <Brand compact hideTextOnMobile />
+          <Brand compact dark hideTextOnMobile />
 
           {/* Links */}
           <NavLinks />
@@ -280,7 +280,7 @@ export default function Navbar() {
 
           {/* Country + actions */}
           <div className="ml-auto flex items-center gap-4 md:ml-0 md:gap-5">
-            <CountrySelect variant="compact" className="hidden md:block" />
+            <CountrySelect variant="compact" className="hidden text-ink md:block" />
             <div className="hidden items-center gap-5 sm:flex">
               {actions.map((a) => (
                 <Action key={a.label} {...a} />
@@ -297,6 +297,9 @@ export default function Navbar() {
         <Container className="pb-3 md:hidden">
           <SearchBox className="w-full" />
         </Container>
+
+        {/* Neeche patli sunehri line */}
+        <span aria-hidden className="block h-px bg-linear-to-r from-transparent via-gold/40 to-transparent" />
       </header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} actions={actions} />

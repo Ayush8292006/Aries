@@ -12,10 +12,10 @@ function Row() {
     <div className="flex shrink-0 items-center">
       {MESSAGES.map((m) => (
         <span key={m} className="flex items-center">
-          <span className="px-8 text-[11px] font-medium uppercase tracking-[0.28em] text-bone/85 transition-colors duration-300 hover:text-gold-light">
+          <span className="px-8 text-[11px] font-medium uppercase tracking-[0.28em] text-ink/80 transition-colors duration-300 hover:text-oxblood">
             {m}
           </span>
-          <span className="ann-star text-[10px] text-gold">✦</span>
+          <span className="ann-star text-[10px] text-oxblood">✦</span>
         </span>
       ))}
     </div>
@@ -24,7 +24,7 @@ function Row() {
 
 export default function AnnouncementBar() {
   return (
-    <div className="ann-bar relative overflow-hidden border-b border-gold/20 bg-ink">
+    <div className="ann-bar relative overflow-hidden border-b border-line bg-[#F8F4EE]">
       <style>{`
         @keyframes ann-scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }
         @keyframes ann-shine  { 0% { transform: translateX(-120%) } 60%,100% { transform: translateX(120%) } }
@@ -36,12 +36,12 @@ export default function AnnouncementBar() {
         @media (prefers-reduced-motion: reduce) { .ann-track, .ann-shine, .ann-star { animation: none; } }
       `}</style>
 
-      {/* Chalti roshni ki lakeer */}
-      <span className="ann-shine pointer-events-none absolute inset-y-0 left-0 z-10 w-full bg-linear-to-r from-transparent via-gold/15 to-transparent" />
+      {/* Chalti sunehri chamak */}
+      <span className="ann-shine pointer-events-none absolute inset-y-0 left-0 z-10 w-full bg-linear-to-r from-transparent via-gold/20 to-transparent" />
 
       {/* Kinaron par fade */}
-      <span className="pointer-events-none absolute inset-y-0 left-0 z-20 w-20 bg-linear-to-r from-ink to-transparent" />
-      <span className="pointer-events-none absolute inset-y-0 right-0 z-20 w-20 bg-linear-to-l from-ink to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 left-0 z-20 w-20 bg-linear-to-r from-[#F8F4EE] to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 right-0 z-20 w-20 bg-linear-to-l from-[#F8F4EE] to-transparent" />
 
       <div className="ann-track flex w-max py-2.5">
         <Row />
