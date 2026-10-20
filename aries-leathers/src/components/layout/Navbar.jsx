@@ -11,6 +11,27 @@ import { useAuth } from '../../hooks/useAuth'
 
 const EASE = [0.22, 1, 0.36, 1]
 
+/* ===== Hover par text roll hota hai (upar jaata hai, neeche se oxblood aata hai) ===== */
+function RollText({ children, active = false }) {
+  return (
+    <span className="relative block overflow-hidden leading-[1.3]">
+      <span
+        className={`block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-full ${
+          active ? 'text-oxblood' : ''
+        }`}
+      >
+        {children}
+      </span>
+      <span
+        aria-hidden
+        className="absolute inset-0 block translate-y-full text-oxblood transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+      >
+        {children}
+      </span>
+    </span>
+  )
+}
+
 /* ===== Search box ===== */
 function SearchBox({ className = '', onDone }) {
   const [query, setQuery] = useState('')
@@ -29,20 +50,21 @@ function SearchBox({ className = '', onDone }) {
     <form
       onSubmit={submit}
       role="search"
-      className={`group flex h-10 items-center gap-2 rounded-full border border-line bg-cream px-4 transition-all duration-300 hover:border-ink/40 focus-within:border-ink focus-within:bg-white focus-within:shadow-[0_6px_20px_rgba(22,20,18,0.08)] ${className}`}
+      className={`group relative flex h-10 items-center gap-2 border-b border-line px-1 transition-colors duration-300 hover:border-ink/40 ${className}`}
     >
       <Search
         size={16}
         strokeWidth={1.75}
-        className="shrink-0 text-muted transition-all duration-300 group-hover:text-ink group-focus-within:scale-110 group-focus-within:text-oxblood"
+        className="shrink-0 text-muted transition-colors duration-300 group-hover:text-ink group-focus-within:text-oxblood"
       />
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for jackets, blazers and more"
+        placeholder="Search jackets, blazers and more"
         aria-label="Search products"
         className="w-full bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
       />
+      <span className="pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-oxblood transition-transform duration-500 ease-out group-focus-within:scale-x-100" />
     </form>
   )
 }
@@ -54,74 +76,61 @@ function Action({ icon: Icon, label, to, count = 0 }) {
       to={to}
       aria-label={count ? `${label} (${count})` : label}
       className={({ isActive }) =>
-        `group flex flex-col items-center gap-0.5 px-1 transition-colors duration-300 ${isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'}`
+        `group flex flex-col items-center gap-1 px-1 transition-colors duration-300 ${isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'}`
       }
     >
-      <span className="relative grid h-9 w-9 place-items-center">
-        <span className="absolute inset-0 scale-0 rounded-full bg-oxblood/10 transition-transform duration-300 ease-out group-hover:scale-100" />
-        <Icon
-          size={20}
-          strokeWidth={1.6}
-          className="relative transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-110"
-        />
-        {count > 0 && (
-          <motion.span
-            key={count}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-            className="absolute -right-0.5 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-oxblood px-1 text-[10px] font-semibold leading-none text-bone"
-          >
-            {count > 9 ? '9+' : count}
-          </motion.span>
-        )}
-      </span>
-      <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>
+      {({ isActive }) => (
+        <>
+          <span className="relative">
+            <Icon
+              size={20}
+              strokeWidth={1.6}
+              className="transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:-translate-y-1"
+            />
+            {count > 0 && (
+              <motion.span
+                key={count}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+                className="absolute -right-2.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-oxblood px-1 text-[10px] font-semibold leading-none text-bone"
+              >
+                {count > 9 ? '9+' : count}
+              </motion.span>
+            )}
+          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-wide">
+            <RollText active={isActive}>{label}</RollText>
+          </span>
+        </>
+      )}
     </NavLink>
   )
 }
 
-/* ===== Desktop links with sliding hover pill ===== */
+/* ===== Desktop links ===== */
 function NavLinks() {
-  const [hovered, setHovered] = useState(null)
   const { pathname } = useLocation()
 
   return (
-    <nav onMouseLeave={() => setHovered(null)} className="hidden items-center gap-1 lg:flex" aria-label="Main">
+    <nav className="hidden items-center gap-9 lg:flex" aria-label="Main">
       {NAV_LINKS.map((link) => {
         const isActive = link.to === '/' ? pathname === '/' : pathname.startsWith(link.to)
-        const isHover = hovered === link.to
         return (
           <NavLink
             key={link.to}
             to={link.to}
             end={link.to === '/'}
-            onMouseEnter={() => setHovered(link.to)}
-            onFocus={() => setHovered(link.to)}
-            onBlur={() => setHovered(null)}
-            className="relative px-4 py-2.5 text-[13px] font-semibold uppercase tracking-wider"
+            className="group relative py-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink"
           >
-            {isHover && (
-              <motion.span
-                layoutId="nav-hover-pill"
-                className="absolute inset-0 rounded-full bg-ink"
-                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-              />
-            )}
+            <RollText active={isActive}>{link.label}</RollText>
             <span
-              className={`relative z-10 transition-colors duration-300 ${
-                isHover ? 'text-bone' : isActive ? 'text-oxblood' : 'text-ink'
+              className={`absolute inset-x-0 bottom-0 h-px bg-oxblood transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isActive
+                  ? 'scale-x-100'
+                  : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
               }`}
-            >
-              {link.label}
-            </span>
-            {isActive && (
-              <motion.span
-                layoutId="nav-active-dot"
-                className="absolute -bottom-1.5 left-0 right-0 mx-auto h-1.5 w-1.5 rounded-full bg-oxblood"
-                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-              />
-            )}
+            />
           </NavLink>
         )
       })}
@@ -177,8 +186,8 @@ function MobileMenu({ open, onClose, actions }) {
                       end={link.to === '/'}
                       onClick={onClose}
                       className={({ isActive }) =>
-                        `group flex items-center justify-between border-b border-line px-5 py-4 text-sm font-semibold uppercase tracking-wider transition-colors hover:bg-cream ${
-                          isActive ? 'text-oxblood' : 'text-ink'
+                        `group flex items-center justify-between border-b border-line px-5 py-4 text-sm font-semibold uppercase tracking-wider transition-colors ${
+                          isActive ? 'text-oxblood' : 'text-ink hover:text-oxblood'
                         }`
                       }
                     >
@@ -249,15 +258,12 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: EASE }}
+      <header
         className={`sticky top-0 z-50 border-b border-line transition-all duration-300 ${
           scrolled ? 'bg-bone/90 shadow-[0_4px_16px_rgba(22,20,18,0.08)] backdrop-blur-md' : 'bg-bone'
         }`}
       >
-        <Container className="flex h-[72px] items-center gap-6 lg:gap-8">
+        <Container className="flex h-[72px] items-center gap-6 lg:gap-10">
           {/* Mobile menu button */}
           <button onClick={() => setMenuOpen(true)} aria-label="Open menu" className="-ml-1 p-1 text-ink lg:hidden">
             <Menu size={22} strokeWidth={1.6} />
@@ -270,12 +276,12 @@ export default function Navbar() {
           <NavLinks />
 
           {/* Search (desktop/tablet) */}
-          <SearchBox className="ml-auto hidden w-full max-w-sm md:flex" />
+          <SearchBox className="ml-auto hidden w-full max-w-xs md:flex" />
 
           {/* Country + actions */}
-          <div className="ml-auto flex items-center gap-4 md:ml-0 md:gap-4">
+          <div className="ml-auto flex items-center gap-4 md:ml-0 md:gap-5">
             <CountrySelect variant="compact" className="hidden md:block" />
-            <div className="hidden items-center gap-3 sm:flex">
+            <div className="hidden items-center gap-5 sm:flex">
               {actions.map((a) => (
                 <Action key={a.label} {...a} />
               ))}
@@ -291,7 +297,7 @@ export default function Navbar() {
         <Container className="pb-3 md:hidden">
           <SearchBox className="w-full" />
         </Container>
-      </motion.header>
+      </header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} actions={actions} />
     </>
