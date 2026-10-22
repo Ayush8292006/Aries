@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { ChevronRight, Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
@@ -50,19 +50,19 @@ function SearchBox({ className = '', onDone }) {
     <form
       onSubmit={submit}
       role="search"
-      className={`group relative flex h-10 items-center gap-2 border-b border-bone/25 px-1 transition-colors duration-300 hover:border-bone/50 ${className}`}
+      className={`group relative flex h-10 items-center gap-2 border-b border-bone/30 px-1 transition-colors duration-300 hover:border-bone/60 ${className}`}
     >
       <Search
         size={16}
         strokeWidth={1.75}
-        className="shrink-0 text-bone/60 transition-colors duration-300 group-hover:text-bone group-focus-within:text-gold-light"
+        className="shrink-0 text-bone/70 transition-colors duration-300 group-hover:text-bone group-focus-within:text-gold-light"
       />
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search jackets, blazers and more"
         aria-label="Search products"
-        className="w-full bg-transparent text-base text-bone outline-none placeholder:text-bone/45 md:text-[13px]"
+        className="w-full bg-transparent text-base text-bone outline-none placeholder:text-bone/55 md:text-[13px]"
       />
       <span className="pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-gold transition-transform duration-500 ease-out group-focus-within:scale-x-100" />
     </form>
@@ -241,12 +241,28 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const headerRef = useRef(null)
+  const [height, setHeight] = useState(0)
+
+  const isHome = pathname === '/'
+  const overVideo = isHome && !scrolled && !menuOpen // Home par video ke upar: bilkul transparent
 
   const actions = [
     { icon: User, label: user ? 'Profile' : 'Login', to: '/profile' },
     { icon: Heart, label: 'Favourites', to: '/wishlist', count: wishlist.length },
     { icon: ShoppingBag, label: 'Cart', to: '/cart', count: totals.count },
   ]
+
+  // Navbar ki height naapo (Home par video iske neeche se shuru ho)
+  useLayoutEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const update = () => setHeight(el.offsetHeight)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Neeche scroll = chhupao, upar scroll = dikhao
   useEffect(() => {
@@ -257,15 +273,11 @@ export default function Navbar() {
       const y = window.scrollY
       const diff = y - lastY
 
-      setScrolled(y > 10)
+      setScrolled(y > 40)
 
-      if (y < 120) {
-        setHidden(false) // page ke upar hamesha dikhe
-      } else if (diff > 6) {
-        setHidden(true) // neeche scroll
-      } else if (diff < -6) {
-        setHidden(false) // upar scroll
-      }
+      if (y < 120) setHidden(false)
+      else if (diff > 6) setHidden(true)
+      else if (diff < -6) setHidden(false)
 
       if (Math.abs(diff) > 6) lastY = y
       ticking = false
@@ -291,13 +303,31 @@ export default function Navbar() {
 
   const isHidden = hidden && !menuOpen
 
+  // Background: Home = transparent / glass, baaki pages = solid kaala
+  const background = !isHome
+    ? `bg-ink ${scrolled ? 'shadow-[0_8px_24px_rgba(0,0,0,0.25)]' : ''}`
+    : overVideo
+      ? 'bg-transparent'
+      : 'bg-ink/70 shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-md backdrop-saturate-150'
+
   return (
     <>
       <header
-        className={`sticky top-0 z-50 text-bone transition-[transform,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        ref={headerRef}
+        // Sirf Home par negative margin = video navbar ke peeche se shuru hota hai
+        style={{ marginBottom: isHome ? -height : 0 }}
+        className={`sticky top-0 z-50 text-bone transition-[transform,background-color,box-shadow,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isHidden ? '-translate-y-full' : 'translate-y-0'
-        } ${scrolled ? 'bg-ink/95 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-md' : 'bg-ink'}`}
+        } ${background}`}
       >
+        {/* Home par video ke upar text padhne ke liye halki chhaya */}
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/55 to-transparent transition-opacity duration-500 ${
+            overVideo ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+
         <Container className="flex h-[72px] items-center gap-6 lg:gap-10">
           {/* Mobile menu button */}
           <button
@@ -337,8 +367,13 @@ export default function Navbar() {
           <SearchBox className="w-full" />
         </Container>
 
-        {/* Neeche patli sunehri line */}
-        <span aria-hidden className="block h-px bg-linear-to-r from-transparent via-gold/40 to-transparent" />
+        {/* Neeche patli sunehri line (transparent state mein chhupi) */}
+        <span
+          aria-hidden
+          className={`block h-px bg-linear-to-r from-transparent via-gold/40 to-transparent transition-opacity duration-500 ${
+            overVideo ? 'opacity-0' : 'opacity-100'
+          }`}
+        />
       </header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} actions={actions} />
