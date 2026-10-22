@@ -5,6 +5,7 @@ import { useCurrency } from '../hooks/useCurrency'
 import { readJSON, writeJSON } from '../utils/storage'
 import { roundForCurrency } from '../utils/currency'
 import { computeTotals } from '../utils/pricing'
+import { getVariantPrice } from '../utils/variantPrice'
 import { MAX_QTY, PROMO_CODES } from '../config/store'
 
 const CART_KEY = 'aries_cart'
@@ -93,8 +94,17 @@ export default function ShopProvider({ children }) {
         .map((i) => {
           const product = getProduct(i.productId)
           if (!product) return null
-          const unit = convert(product.price) // pehle unit convert...
-          return { ...i, product, unit, total: roundForCurrency(unit * i.qty, currency.code) } // ...phir × qty
+          // Size / colour ke hisaab se base (USD) price
+          const { price: basePrice, extra: baseExtra } = getVariantPrice(product, { size: i.size, color: i.color })
+          const unit = convert(basePrice) // pehle unit convert...
+          return {
+            ...i,
+            product,
+            basePrice,
+            baseExtra,
+            unit,
+            total: roundForCurrency(unit * i.qty, currency.code), // ...phir × qty
+          }
         })
         .filter(Boolean),
     [items, getProduct, convert, currency.code]

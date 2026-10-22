@@ -12,10 +12,15 @@ import FinalCta from '../../components/home/FinalCta'
 export default function Home() {
   return (
     <>
+      {/* 1. Video */}
       <VideoHero />
+
+      {/* 2. Categories — video ke turant baad */}
+      <Categories />
+
+      {/* 3. Baaki sections */}
       <Intro />
       <Spotlight />
-      <Categories />
       <Trending />
       <Craft />
       <Story />

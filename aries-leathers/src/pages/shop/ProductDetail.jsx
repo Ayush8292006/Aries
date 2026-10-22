@@ -15,6 +15,7 @@ import { useCart } from '../../hooks/useCart'
 import { useWishlist } from '../../hooks/useWishlist'
 import { CATEGORIES } from '../../config/site'
 import { MAX_QTY } from '../../config/store'
+import { getVariantExtra, getVariantPrice, hasVariantPricing } from '../../utils/variantPrice'
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -23,9 +24,9 @@ const COLOR_HEX = {
   'espresso brown': '#3B2416', tan: '#C19A6B', blue: '#2C4A8A', navy: '#1F2A44',
   gray: '#8A8A8A', charcoal: '#3A3A3A', white: '#F3F0EA', olive: '#6B6B3A',
   red: '#8A1F1F', beige: '#D9C7A7', burgundy: '#5E1A24',
-    mustard: '#C9A227', orange: '#D9662B', 'royal blue': '#1F4FB0', 'powder blue': '#9DB8D9', 'distressed brown': '#6B4128',
+  mustard: '#C9962B', orange: '#C2622D', 'royal blue': '#2A4FA8', 'powder blue': '#9DB7D5', 'distressed brown': '#5C3A24',
 }
-const LIGHT_SWATCHES = ['#F3F0EA', '#D9C7A7', '#C19A6B']
+const LIGHT_SWATCHES = ['#F3F0EA', '#D9C7A7', '#C19A6B', '#9DB7D5', '#C9962B']
 
 function Accordion({ id, title, open, onToggle, children }) {
   const isOpen = open === id
@@ -125,7 +126,7 @@ function OptionHeading({ label, value, extra }) {
 
 function ProductView({ product }) {
   const { products } = useProducts()
-  const { country, currency } = useCurrency()
+  const { country, currency, formatPrice } = useCurrency()
   const { addItem, openCart } = useCart()
   const { isWishlisted, toggleWishlist } = useWishlist()
 
@@ -134,6 +135,10 @@ function ProductView({ product }) {
   const [color, setColor] = useState(product.colors?.[0] ?? null)
   const [sizeError, setSizeError] = useState(false)
   const [open, setOpen] = useState('description')
+
+  // Size / colour ke hisaab se price (USD base)
+  const variant = getVariantPrice(product, { size, color })
+  const varies = hasVariantPricing(product)
 
   const liked = isWishlisted(product.id)
   const category = CATEGORIES.find((c) => c.slug === product.category)
@@ -200,7 +205,29 @@ function ProductView({ product }) {
                 <h1 className="mt-5 font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">{product.name}</h1>
                 <p className="mt-2 text-sm text-muted">{product.material}</p>
 
-                <Price amount={product.price} mrp={product.mrp} className="mt-6 text-2xl text-ink" />
+                {/* Price — size badalne par roll hota hai */}
+                <div className="relative mt-6 h-9 overflow-hidden">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    <motion.div
+                      key={variant.price}
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: '0%', opacity: 1 }}
+                      exit={{ y: '-100%', opacity: 0 }}
+                      transition={{ duration: 0.35, ease: EASE }}
+                    >
+                      <Price amount={variant.price} mrp={variant.mrp} className="text-2xl text-ink" />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                {varies && !size && (
+                  <p className="mt-1 text-xs text-muted">From price shown · final price depends on the size you choose.</p>
+                )}
+                {variant.extra > 0 && (
+                  <p className="mt-1 text-xs text-muted">
+                    Includes {formatPrice(variant.extra)} for{' '}
+                    {[size, getVariantExtra(product, { color }) > 0 ? color : null].filter(Boolean).join(' · ')}
+                  </p>
+                )}
                 <p className="mt-2 flex items-center gap-2 text-xs text-muted">
                   <Flag code={country.code} /> Prices in {currency.name} ({currency.code}) · Free shipping
                 </p>
@@ -269,7 +296,12 @@ function ProductView({ product }) {
                                 : 'border-line text-charcoal hover:border-ink'
                           }`}
                         >
-                          {s}
+                                                    <span className="block">{s}</span>
+                          {varies && (
+                            <span className={`mt-0.5 block whitespace-nowrap text-[10px] font-normal ${size === s ? 'text-bone/75' : 'text-muted'}`}>
+                              {formatPrice(getVariantPrice(product, { size: s, color }).price)}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -417,3 +449,6 @@ export default function ProductDetail() {
   // key se doosre product par jaate hi size/colour/quantity reset ho jaate hain
   return <ProductView key={product.id} product={product} />
 }
+
+
+formatPrice

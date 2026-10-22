@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CurrencyContext } from './CurrencyContext'
 import {
-  CURRENCIES, DEFAULT_COUNTRY, RATES_META, STATIC_RATES, STORAGE_KEY, getCountry,
+  CURRENCIES, RATES_META, STATIC_RATES, STORAGE_KEY, getCountry,
 } from '../config/currency'
 import { convertCurrency, formatCurrency } from '../utils/currency'
+import { detectCountry } from '../utils/detectCountry'
+
+// Jo desh hamari list mein nahi hai, unke liye US Dollar
+const INTERNATIONAL_FALLBACK = 'US'
 
 function readSavedCountry() {
   try {
@@ -14,20 +18,27 @@ function readSavedCountry() {
   }
 }
 
+/** Pehle buyer ki chuni hui country, warna apne aap pehchani hui */
+function initialCountry() {
+  return readSavedCountry() ?? detectCountry() ?? INTERNATIONAL_FALLBACK
+}
+
 export default function CurrencyProvider({ children }) {
-  // null = user ne abhi tak country select nahi ki
-  const [selectedCode, setSelectedCode] = useState(readSavedCountry)
+  const [selectedCode, setSelectedCode] = useState(initialCountry)
+  const [isManual, setIsManual] = useState(() => readSavedCountry() !== null)
 
   // Abhi static rates. Live rates chahiye to yahan fetch karke setRates() karna.
   const [rates] = useState(STATIC_RATES)
 
-  const country = getCountry(selectedCode ?? DEFAULT_COUNTRY)
+  const country = getCountry(selectedCode) ?? getCountry(INTERNATIONAL_FALLBACK)
   const currency = CURRENCIES[country.currency]
 
+  /** Buyer khud country badle — yaad rakho */
   const setCountry = useCallback((code) => {
     const next = getCountry(code)
     if (!next) return
     setSelectedCode(next.code)
+    setIsManual(true)
     try {
       localStorage.setItem(
         STORAGE_KEY,
@@ -45,7 +56,10 @@ export default function CurrencyProvider({ children }) {
   // Doosre tab mein country badle to yahan bhi update ho
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === STORAGE_KEY) setSelectedCode(readSavedCountry())
+      if (e.key === STORAGE_KEY) {
+        setSelectedCode(initialCountry())
+        setIsManual(readSavedCountry() !== null)
+      }
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
@@ -61,7 +75,9 @@ export default function CurrencyProvider({ children }) {
       country,
       currency,
       countryCode: country.code,
-      isCountrySelected: selectedCode !== null,
+      // Country hamesha set hai (auto ya buyer ki choice), popup ki zaroorat nahi
+      isCountrySelected: true,
+      isAutoDetected: !isManual,
       setCountry,
       rates,
       ratesMeta: RATES_META,
@@ -70,7 +86,7 @@ export default function CurrencyProvider({ children }) {
       /** Base (USD) amount → seedha display string */
       formatPrice: (baseAmount) => format(convert(baseAmount)),
     }
-  }, [country, currency, selectedCode, rates, setCountry])
+  }, [country, currency, isManual, rates, setCountry])
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>
 }
