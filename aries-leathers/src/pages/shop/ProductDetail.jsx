@@ -264,7 +264,7 @@ function ProductView({ product }) {
                   </div>
                 )}
 
-                {/* Size */}
+                {/* Size — har size ke neeche uska price */}
                 {product.sizes?.length > 0 && (
                   <div className="mt-8">
                     <OptionHeading
@@ -296,7 +296,7 @@ function ProductView({ product }) {
                                 : 'border-line text-charcoal hover:border-ink'
                           }`}
                         >
-                                                    <span className="block">{s}</span>
+                          <span className="block">{s}</span>
                           {varies && (
                             <span className={`mt-0.5 block whitespace-nowrap text-[10px] font-normal ${size === s ? 'text-bone/75' : 'text-muted'}`}>
                               {formatPrice(getVariantPrice(product, { size: s, color }).price)}
@@ -449,6 +449,3 @@ export default function ProductDetail() {
   // key se doosre product par jaate hi size/colour/quantity reset ho jaate hain
   return <ProductView key={product.id} product={product} />
 }
-
-
-formatPrice
