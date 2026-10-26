@@ -57,13 +57,18 @@ function Accordion({ id, title, open, onToggle, children }) {
   )
 }
 
+// ===== UPDATED PREMIUM GALLERY =====
 function Gallery({ images, name }) {
   const [active, setActive] = useState(0)
   const [zoom, setZoom] = useState({ on: false, x: 50, y: 50 })
 
   const handleMove = (e) => {
     const r = e.currentTarget.getBoundingClientRect()
-    setZoom({ on: true, x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 })
+    setZoom({ 
+      on: true, 
+      x: ((e.clientX - r.left) / r.width) * 100, 
+      y: ((e.clientY - r.top) / r.height) * 100 
+    })
   }
 
   return (
@@ -99,12 +104,24 @@ function Gallery({ images, name }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.45, ease: EASE }}
           >
-            <div
-              className="absolute inset-0 transition-transform duration-300 ease-out"
-              style={{ transform: zoom.on ? 'scale(1.8)' : 'scale(1)', transformOrigin: `${zoom.x}% ${zoom.y}%` }}
+            {/* Premium inner zoom logic */}
+            <motion.div
+              className="absolute inset-0"
+              animate={{
+                scale: zoom.on ? 1.8 : 1,
+                transformOrigin: zoom.on ? `${zoom.x}% ${zoom.y}%` : 'center center'
+              }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 300, 
+                damping: 30, 
+                mass: 0.5,
+                // Smooth fallback for exit
+                scale: { duration: 0.4, ease: EASE } 
+              }}
             >
               <SmartImage src={images[active]} alt={name} label={name} className="h-full w-full" />
-            </div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
@@ -136,7 +153,6 @@ function ProductView({ product }) {
   const [sizeError, setSizeError] = useState(false)
   const [open, setOpen] = useState('description')
 
-  // Size / colour ke hisaab se price (USD base)
   const variant = getVariantPrice(product, { size, color })
   const varies = hasVariantPricing(product)
 
@@ -177,7 +193,6 @@ function ProductView({ product }) {
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-            {/* ===== Gallery ===== */}
             <motion.div
               className="lg:col-span-7"
               initial={{ opacity: 0, y: 30 }}
@@ -187,7 +202,6 @@ function ProductView({ product }) {
               <Gallery images={product.images ?? []} name={product.name} />
             </motion.div>
 
-            {/* ===== Info ===== */}
             <motion.div
               className="lg:col-span-5"
               initial={{ opacity: 0, y: 30 }}
@@ -205,7 +219,6 @@ function ProductView({ product }) {
                 <h1 className="mt-5 font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">{product.name}</h1>
                 <p className="mt-2 text-sm text-muted">{product.material}</p>
 
-                {/* Price — size badalne par roll hota hai */}
                 <div className="relative mt-6 h-9 overflow-hidden">
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div
@@ -232,7 +245,6 @@ function ProductView({ product }) {
                   <Flag code={country.code} /> Prices in {currency.name} ({currency.code}) · Free shipping
                 </p>
 
-                {/* Colour */}
                 {product.colors?.length > 0 && (
                   <div className="mt-8">
                     <OptionHeading label="Colour" value={color} />
@@ -264,7 +276,6 @@ function ProductView({ product }) {
                   </div>
                 )}
 
-                {/* Size — har size ke neeche uska price */}
                 {product.sizes?.length > 0 && (
                   <div className="mt-8">
                     <OptionHeading
@@ -314,7 +325,6 @@ function ProductView({ product }) {
                   </div>
                 )}
 
-                {/* Quantity + Add to cart + Favourite */}
                 <div className="mt-8 flex items-stretch gap-3">
                   <div className="flex items-center border border-line">
                     <button
@@ -360,7 +370,6 @@ function ProductView({ product }) {
                   </li>
                 </ul>
 
-                {/* Accordions */}
                 <div className="mt-8 border-t border-line">
                   <Accordion id="description" title="Description" open={open} onToggle={setOpen}>
                     {product.description}
@@ -403,7 +412,6 @@ function ProductView({ product }) {
         </Container>
       </section>
 
-      {/* ===== Related ===== */}
       {related.length > 0 && (
         <section className="border-t border-line bg-ivory">
           <Container className="py-20">
@@ -446,6 +454,5 @@ export default function ProductDetail() {
     )
   }
 
-  // key se doosre product par jaate hi size/colour/quantity reset ho jaate hain
   return <ProductView key={product.id} product={product} />
 }

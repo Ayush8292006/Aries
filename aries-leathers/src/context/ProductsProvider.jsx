@@ -3,7 +3,7 @@ import { ProductsContext } from './ProductsContext'
 import { SEED_PRODUCTS } from '../data/products'
 import { readJSON, writeJSON } from '../utils/storage'
 
-const STORAGE_KEY = 'aries_products_v3'
+const STORAGE_KEY = 'aries_products_v4' // v3 se v4 kar diya taaki naya data load ho
 
 function loadProducts() {
   const saved = readJSON(STORAGE_KEY, null)
@@ -20,7 +20,6 @@ export default function ProductsProvider({ children }) {
 
   const getProduct = useCallback((id) => products.find((p) => p.id === id) ?? null, [products])
 
-  // ===== Admin (Step 7) — price hamesha BASE USD mein =====
   const addProduct = useCallback((product) => {
     setProducts((prev) => [{ ...product, createdAt: new Date().toISOString() }, ...prev])
   }, [])
@@ -33,7 +32,10 @@ export default function ProductsProvider({ children }) {
     setProducts((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
-  const resetProducts = useCallback(() => setProducts(SEED_PRODUCTS), [])
+  const resetProducts = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY) 
+    setProducts(SEED_PRODUCTS)
+  }, [])
 
   const value = useMemo(
     () => ({ products, getProduct, addProduct, updateProduct, deleteProduct, resetProducts }),

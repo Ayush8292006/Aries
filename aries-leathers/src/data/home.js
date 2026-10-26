@@ -11,12 +11,23 @@ export const HOME_IMAGES = {
   auth: etsy('3f10c8', '8455909316', '5n3n'),         // leather blazer
 }
 
+// 🔥 YAHAN NAYI CATEGORIES KI IMAGES ADD KI GAYI HAIN 🔥
 export const CATEGORY_IMAGES = {
-  jackets: etsy('267345', '8611484318', 'dzte'),
-  'blazers-coats': etsy('3f10c8', '8455909316', '5n3n'),
-  trousers: etsy('7ffd0a', '8491002445', 'nmo2'),
-  vests: etsy('e29410', '8649632413', 'kgww'),
-  home: etsy('fa036b', '8515187119', '645s'),
+  'mens-pant': etsy('7ffd0a', '8491002445', 'nmo2'),
+  'womens-pant': etsy('7ffd0a', '8491002445', 'nmo2'),
+  'mens-jacket': etsy('267345', '8611484318', 'dzte'),
+  'womens-jacket': etsy('26898f', '8480296432', 'gffh'),
+  'mens-vest': etsy('e29410', '8649632413', 'kgww'),
+  'mens-trench-coat': etsy('4c5648', '8668714611', 'bs79'),
+  'womens-trench-coat': etsy('3f10c8', '8455909316', '5n3n'),
+  'leather-shirt': etsy('5fadc9', '8412332382', 'faii'),
+  'jacket-pant-combo': etsy('267345', '8611484318', 'dzte'),
+  'mens-shorts': etsy('394737', '8443135412', 'a99b'),
+  'womens-shorts': etsy('8443135402', '8443135402', 'kn9m'),
+  'leather-headrest-cover': etsy('fa036b', '8515187119', '645s'),
+  'seat-pad': etsy('fa036b', '8515187119', '645s'),
+  'apron': etsy('145478', '8492937818', '2fgt'),
+  'kids-jacket': etsy('c2802c', '8243457729', 'lr2j'),
 }
 
 export const FEATURED = { name: 'Quilted Moto Jacket', price: 157.5 }

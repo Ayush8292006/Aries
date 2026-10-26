@@ -1,276 +1,58 @@
-/**
- * ARIES LEATHERS — 25 asli leather products (Etsy shop: ariesleathers.etsy.com)
- * price = sale price, mrp = original price — dono BASE CURRENCY (USD) mein.
- */
 const ETSY = 'https://i.etsystatic.com/46094302/r/il'
+
+// HELLO WORLD
 const etsy = (hash, id, key) => `${ETSY}/${hash}/${id}/il_794xN.${id}_${key}.jpg`
 const LISTING = 'https://www.etsy.com/listing/'
 
-const JACKET_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'Custom']
-const TROUSER_SIZES = ['26', '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50', 'Custom']
+const JACKET_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'Custom']
+const TROUSER_SIZES = ['26', '28', '30', '32', '34', '36', '38', '40', 'Custom']
 const PAD_SIZES = ['10"', '12"', '14"', '16"', '18"', '20"', '22"']
 
 const LAMB = 'Genuine lambskin leather'
 const SUEDE = 'Genuine goatskin suede'
 
 export const SEED_PRODUCTS = [
-  // ===================== JACKETS =====================
-  {
-    id: 'quilted-moto-jacket',
-    name: 'Quilted Lambskin Moto Jacket',
-    category: 'jackets', gender: 'men', price: 157.5, mrp: 210, material: LAMB,
-    colors: ['Black'], sizes: JACKET_SIZES, tag: 'New', featured: true,
-    description: 'A classic asymmetric biker in soft lambskin, finished with brass-toned hardware, diamond-quilted shoulders and ribbed sleeves.',
-    details: ['100% genuine lambskin', 'Asymmetric front zip', 'Diamond-quilted shoulder and waist panels', 'Zippered cuffs, three zip pockets', 'Satin lining'],
-    images: [etsy('267345', '8611484318', 'dzte'), etsy('1ccbb5', '8659313019', '58yd'), etsy('a3dd2f', '8611484178', 'fpg2'), etsy('c837f2', '8659312967', 'tsff')],
-    etsyUrl: `${LISTING}4586978876`, createdAt: '2026-10-02',
-  },
-  {
-    id: 'distressed-brown-moto-jacket',
-    name: 'Distressed Brown Moto Jacket',
-    category: 'jackets', gender: 'men', price: 143.96, mrp: 191.95, material: 'Genuine distressed leather',
-    colors: ['Distressed brown', 'Black'], sizes: JACKET_SIZES, tag: 'Bestseller', featured: true,
-    description: 'A rugged vintage biker with a stand collar, snap-flap pockets and a tartan-lined interior. The distressed finish gives it a worn-in look from day one.',
-    details: ['Genuine distressed leather', 'Stand-up collar, front zip', 'Four snap-flap pockets', 'Tartan cotton lining', 'Snap cuffs'],
-    images: [etsy('00f65c', '8740120179', 's5ky'), etsy('c1df45', '7667413534', 'j9nx'), etsy('779467', '7667413596', 'qxa5'), etsy('d455a9', '7715370587', 'kzdv')],
-    etsyUrl: `${LISTING}4597191809`, createdAt: '2026-10-15',
-  },
-  {
-    id: 'black-slim-biker-jacket',
-    name: 'Black Slim Fit Biker Jacket',
-    category: 'jackets', gender: 'men', price: 153.75, mrp: 205, material: LAMB,
-    colors: ['Black'], sizes: JACKET_SIZES, featured: true,
-    description: 'A clean, slim-fit moto jacket in genuine black leather — the one jacket that works over a tee, a hoodie or a shirt.',
-    details: ['100% genuine leather', 'Slim, tailored fit', 'Zip front with snap collar', 'Zippered pockets', 'Linen-blend lining'],
-    images: [etsy('5fadc9', '8412332382', 'faii'), etsy('accad5', '8412328420', 'h0ww'), etsy('20e34f', '8460210899', 'fc6l')],
-    etsyUrl: `${LISTING}4559960155`, createdAt: '2026-09-02',
-  },
-  {
-    id: 'tartan-lined-field-jacket',
-    name: 'Tartan Lined Field Jacket',
-    category: 'jackets', gender: 'men', price: 143.96, mrp: 191.95, material: 'Full-grain distressed leather',
-    colors: ['Brown'], sizes: JACKET_SIZES,
-    description: 'A café-racer field jacket in full-grain leather with four utility pockets and a warm tartan lining.',
-    details: ['Full-grain leather', 'Café-racer collar', 'Four flap pockets with snaps', 'Tartan lining', 'Snap cuffs'],
-    images: [etsy('f6e439', '8460180725', 'dmo9'), etsy('1ae67a', '8460180207', 'dl1m'), etsy('779467', '7667413596', 'qxa5')],
-    etsyUrl: `${LISTING}4559953377`, createdAt: '2026-09-01',
-  },
-  {
-    id: 'yellow-cafe-racer-jacket',
-    name: 'Mustard Café Racer Jacket',
-    category: 'jackets', gender: 'men', price: 143.96, mrp: 191.95, material: LAMB,
-    colors: ['Mustard'], sizes: JACKET_SIZES, tag: 'New',
-    description: 'A vintage-washed café racer in a rich mustard lambskin, with a stand collar and snap-flap pockets.',
-    details: ['100% genuine lambskin', 'Distressed vintage finish', 'Stand-up collar', 'Four snap-flap pockets', 'Plaid lining'],
-    images: [etsy('21f242', '8692288998', 'p4z7'), etsy('503ab3', '8740101107', 'lh1i'), etsy('c1df45', '7667413534', 'j9nx')],
-    etsyUrl: `${LISTING}4597211222`, createdAt: '2026-10-16',
-  },
-  {
-    id: 'orange-trucker-jacket',
-    name: 'Orange Lambskin Trucker Jacket',
-    category: 'jackets', gender: 'men', price: 157.5, mrp: 210, material: LAMB,
-    colors: ['Orange'], sizes: JACKET_SIZES,
-    description: 'The classic trucker silhouette, cut in soft orange lambskin — chest pockets, button front and a satin lining.',
-    details: ['100% genuine lambskin', 'Button front', 'Two chest flap pockets', 'Metal hardware', 'Satin lining'],
-    images: [etsy('043792', '8550366809', 'frlc'), etsy('ec071d', '8502492592', 'bbil'), etsy('d84dbb', '8502492610', 'tjtr')],
-    etsyUrl: `${LISTING}4572449511`, createdAt: '2026-09-10',
-  },
-  {
-    id: 'a2-aviator-flight-jacket',
-    name: 'A-2 Aviator Flight Jacket',
-    category: 'jackets', gender: 'men', price: 148.96, mrp: 198.62, material: LAMB,
-    colors: ['Distressed brown'], sizes: JACKET_SIZES, featured: true,
-    description: 'Our take on the classic A-2 flight jacket — distressed brown lambskin, snap collar and ribbed cuffs and hem.',
-    details: ['100% genuine lambskin', 'Distressed brown finish', 'Snap-down collar', 'Ribbed cuffs and waistband', 'Two flap pockets'],
-    images: [etsy('5f93e8', '7722067437', 'd7sy'), etsy('350071', '7674113498', '725s'), etsy('9a4487', '7674113488', '1ith'), etsy('d16feb', '7722066549', 'tpxy')],
-    etsyUrl: `${LISTING}4452238688`, createdAt: '2026-06-20',
-  },
-  {
-    id: 'brown-suede-harrington-jacket',
-    name: 'Brown Suede Harrington Jacket',
-    category: 'jackets', gender: 'men', price: 157.5, mrp: 210, material: SUEDE,
-    colors: ['Cognac brown', 'Navy', 'Charcoal', 'Olive'], sizes: JACKET_SIZES, tag: 'Bestseller', featured: true,
-    description: 'A timeless Harrington cut from velvety goatskin suede — light, soft and easy to wear from spring through autumn.',
-    details: ['100% genuine goatskin suede', 'Heavy-duty metal front zip', 'Classic turn-down collar', '2 welt pockets + inner pocket', 'Satin lining'],
-    images: [etsy('b1c930', '8455379536', 'nxtw'), etsy('f44abb', '8523459517', '77ie'), etsy('237bb1', '8503211987', 'ac5d'), etsy('9def78', '8503212291', 'dtfw')],
-    etsyUrl: `${LISTING}4565842596`, createdAt: '2026-09-15',
-  },
-  {
-    id: 'olive-suede-trucker-jacket',
-    name: 'Olive Suede Trucker Jacket',
-    category: 'jackets', gender: 'men', price: 157.5, mrp: 210, material: SUEDE,
-    colors: ['Olive'], sizes: JACKET_SIZES, tag: 'New',
-    description: 'A shirt-style trucker in olive goatskin suede, with a pointed collar, button front and two flap chest pockets.',
-    details: ['Genuine goatskin suede', 'Button front', 'Two buttoned chest pockets', 'Pointed collar', 'Satin lining'],
-    images: [etsy('f53b6e', '8692525764', 'rzkg'), etsy('3d9af7', '8740337245', '20pe'), etsy('0c3f04', '8692525790', '7r20'), etsy('1e727e', '8692525810', 'hqpo')],
-    etsyUrl: `${LISTING}4597218733`, createdAt: '2026-10-16',
-  },
-  {
-    id: 'red-leather-bomber-jacket',
-    name: 'Red Leather Bomber Jacket',
-    category: 'jackets', gender: 'men', price: 150, mrp: 200, material: LAMB,
-    colors: ['Red'], sizes: JACKET_SIZES,
-    description: 'A bold varsity-style bomber in red lambskin with ribbed collar, cuffs and hem.',
-    details: ['100% genuine lambskin', 'Ribbed collar, cuffs and hem', 'Full zip front', 'Two side pockets', 'Linen-blend lining'],
-    images: [etsy('c2802c', '8243457729', 'lr2j'), etsy('ec850f', '8243457681', 'lff7'), etsy('2db833', '8243457767', 'ctc9'), etsy('2eed6b', '8243457769', 'gr0z')],
-    etsyUrl: `${LISTING}4530333532`, createdAt: '2026-08-10',
-  },
-  {
-    id: 'royal-blue-bomber-jacket',
-    name: 'Royal Blue Lambskin Bomber',
-    category: 'jackets', gender: 'men', price: 150, mrp: 200, material: LAMB,
-    colors: ['Royal blue'], sizes: JACKET_SIZES,
-    description: 'A clean bomber in vivid royal blue lambskin, with a classic collar, ribbed cuffs and horizontal seam detailing.',
-    details: ['100% genuine lambskin', 'Full zip front', 'Ribbed cuffs and hem', 'Two side pockets', 'Linen-blend lining'],
-    images: [etsy('44a221', '8630720041', '83i1'), etsy('7c4145', '8630720057', 'aclr'), etsy('d70b6a', '8582879990', 'pwkg'), etsy('fd8332', '8630724319', 'mxb8')],
-    etsyUrl: `${LISTING}4583210511`, createdAt: '2026-10-05',
-  },
-  {
-    id: 'powder-blue-bomber-jacket',
-    name: 'Powder Blue Lambskin Bomber',
-    category: 'jackets', gender: 'men', price: 150, mrp: 200, material: LAMB,
-    colors: ['Powder blue'], sizes: JACKET_SIZES,
-    description: 'A soft powder-blue bomber in buttery lambskin — a fresh colour for a classic shape.',
-    details: ['100% genuine lambskin', 'Full zip front', 'Ribbed cuffs and hem', 'Two side pockets', 'Linen-blend lining'],
-    images: [etsy('70341d', '8630654361', 'lwm8'), etsy('10cfaf', '8630654377', 'o55p'), etsy('ba3956', '8630658573', 'p0ev'), etsy('53e236', '8630658627', 'sbd8')],
-    etsyUrl: `${LISTING}4583201673`, createdAt: '2026-10-05',
-  },
-  {
-    id: 'genuine-leather-hoodie',
-    name: 'Lambskin Leather Hoodie',
-    category: 'jackets', gender: 'unisex', price: 146.71, mrp: 195.61, material: LAMB,
-    colors: ['Black', 'Brown'], sizes: JACKET_SIZES,
-    description: 'A pullover hoodie made entirely in soft lambskin — streetwear comfort with the character of real leather.',
-    details: ['100% genuine lambskin', 'Pullover hooded design', 'Front kangaroo pocket', 'Ribbed cuffs and hem', 'Linen-blend lining'],
-    images: [etsy('e4f2aa', '7319764072', '4t4d'), etsy('c137d9', '7319764070', '7j4o'), etsy('aa75d9', '7319764042', 'xfav'), etsy('808d8d', '7319764048', 'ixmu')],
-    etsyUrl: `${LISTING}4392474361`, createdAt: '2026-05-12',
-  },
-  {
-    id: 'womens-oversized-bomber-jacket',
-    name: "Women's Oversized Leather Bomber",
-    category: 'jackets', gender: 'women', price: 157.5, mrp: 210, material: LAMB,
-    colors: ['Dark brown', 'Black'], sizes: JACKET_SIZES, tag: 'New', featured: true,
-    description: 'A relaxed, oversized bomber in dark brown lambskin with a high collar — made for layering through autumn and winter.',
-    details: ['100% genuine lambskin', 'Oversized, boxy fit', 'High stand collar', 'Metal hardware', 'Satin lining'],
-    images: [etsy('26898f', '8480296432', 'gffh'), etsy('546e83', '8528201255', '9dag'), etsy('fe5daa', '8528201303', 'gvmj')],
-    etsyUrl: `${LISTING}4569497006`, createdAt: '2026-09-05',
-  },
-  {
-    id: 'womens-cropped-biker-jacket',
-    name: "Women's Cropped Biker Jacket",
-    category: 'jackets', gender: 'women', price: 157.5, mrp: 210, material: LAMB,
-    colors: ['Black'], sizes: JACKET_SIZES,
-    description: 'A cropped, long-sleeve biker shrug in black lambskin — sharp over dresses and high-waisted trousers alike.',
-    details: ['100% genuine lambskin', 'Cropped bolero length', 'Asymmetric zip', 'Metal hardware', 'Satin lining'],
-    images: [etsy('290b6f', '8550506003', 'mf93'), etsy('31d35b', '8502632356', 'hxpk'), etsy('2d2707', '8550506109', '9hhx'), etsy('315895', '8550506611', '69mx')],
-    etsyUrl: `${LISTING}4572475887`, createdAt: '2026-09-10',
-  },
+  // ===================== MEN'S JACKETS (12) =====================
+  { id: 'quilted-moto-jacket', name: 'Quilted Lambskin Moto Jacket', category: 'mens-jacket', gender: 'men', price: 157.5, mrp: 210, material: LAMB, colors: ['Black'], sizes: JACKET_SIZES, tag: 'New', featured: true, description: 'Classic biker.', details: ['Lambskin'], images: [etsy('267345', '8611484318', 'dzte')], etsyUrl: `${LISTING}4586978876`, createdAt: '2026-10-02' },
+  { id: 'distressed-brown-moto-jacket', name: 'Distressed Brown Moto Jacket', category: 'mens-jacket', gender: 'men', price: 143.96, mrp: 191.95, material: 'Distressed leather', colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'Vintage biker.', details: ['Distressed leather'], images: [etsy('00f65c', '8740120179', 's5ky')], etsyUrl: `${LISTING}4597191809`, createdAt: '2026-10-15' },
+  { id: 'black-slim-biker-jacket', name: 'Black Slim Fit Biker Jacket', category: 'mens-jacket', gender: 'men', price: 153.75, mrp: 205, material: LAMB, colors: ['Black'], sizes: JACKET_SIZES, featured: true, description: 'Slim fit moto.', details: ['Lambskin'], images: [etsy('5fadc9', '8412332382', 'faii')], etsyUrl: `${LISTING}4559960155`, createdAt: '2026-09-02' },
+  { id: 'tartan-lined-field-jacket', name: 'Tartan Lined Field Jacket', category: 'mens-jacket', gender: 'men', price: 143.96, mrp: 191.95, material: 'Full-grain leather', colors: ['Brown'], sizes: JACKET_SIZES, description: 'Field jacket.', details: ['Full-grain'], images: [etsy('f6e439', '8460180725', 'dmo9')], etsyUrl: `${LISTING}4559953377`, createdAt: '2026-09-01' },
+  { id: 'yellow-cafe-racer-jacket', name: 'Mustard Café Racer Jacket', category: 'mens-jacket', gender: 'men', price: 143.96, mrp: 191.95, material: LAMB, colors: ['Mustard'], sizes: JACKET_SIZES, tag: 'New', description: 'Cafe racer.', details: ['Lambskin'], images: [etsy('21f242', '8692288998', 'p4z7')], etsyUrl: `${LISTING}4597211222`, createdAt: '2026-10-16' },
+  { id: 'orange-trucker-jacket', name: 'Orange Lambskin Trucker Jacket', category: 'mens-jacket', gender: 'men', price: 157.5, mrp: 210, material: LAMB, colors: ['Orange'], sizes: JACKET_SIZES, description: 'Trucker jacket.', details: ['Lambskin'], images: [etsy('043792', '8550366809', 'frlc')], etsyUrl: `${LISTING}4572449511`, createdAt: '2026-09-10' },
+  { id: 'a2-aviator-flight-jacket', name: 'A-2 Aviator Flight Jacket', category: 'mens-jacket', gender: 'men', price: 148.96, mrp: 198.62, material: LAMB, colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'A-2 jacket.', details: ['Lambskin'], images: [etsy('5f93e8', '7722067437', 'd7sy')], etsyUrl: `${LISTING}4452238688`, createdAt: '2026-06-20' },
+  { id: 'brown-suede-harrington-jacket', name: 'Brown Suede Harrington Jacket', category: 'mens-jacket', gender: 'men', price: 157.5, mrp: 210, material: SUEDE, colors: ['Brown'], sizes: JACKET_SIZES, tag: 'Bestseller', featured: true, description: 'Harrington.', details: ['Suede'], images: [etsy('b1c930', '8455379536', 'nxtw')], etsyUrl: `${LISTING}4565842596`, createdAt: '2026-09-15' },
+  { id: 'olive-suede-trucker-jacket', name: 'Olive Suede Trucker Jacket', category: 'mens-jacket', gender: 'men', price: 157.5, mrp: 210, material: SUEDE, colors: ['Olive'], sizes: JACKET_SIZES, tag: 'New', description: 'Trucker.', details: ['Suede'], images: [etsy('f53b6e', '8692525764', 'rzkg')], etsyUrl: `${LISTING}4597218733`, createdAt: '2026-10-16' },
+  { id: 'red-leather-bomber-jacket', name: 'Red Leather Bomber Jacket', category: 'mens-jacket', gender: 'men', price: 150, mrp: 200, material: LAMB, colors: ['Red'], sizes: JACKET_SIZES, description: 'Bomber.', details: ['Lambskin'], images: [etsy('c2802c', '8243457729', 'lr2j')], etsyUrl: `${LISTING}4530333532`, createdAt: '2026-08-10' },
+  { id: 'royal-blue-bomber-jacket', name: 'Royal Blue Lambskin Bomber', category: 'mens-jacket', gender: 'men', price: 150, mrp: 200, material: LAMB, colors: ['Blue'], sizes: JACKET_SIZES, description: 'Bomber.', details: ['Lambskin'], images: [etsy('44a221', '8630720041', '83i1')], etsyUrl: `${LISTING}4583210511`, createdAt: '2026-10-05' },
+  { id: 'powder-blue-bomber-jacket', name: 'Powder Blue Lambskin Bomber', category: 'mens-jacket', gender: 'men', price: 150, mrp: 200, material: LAMB, colors: ['Blue'], sizes: JACKET_SIZES, description: 'Bomber.', details: ['Lambskin'], images: [etsy('70341d', '8630654361', 'lwm8')], etsyUrl: `${LISTING}4583201673`, createdAt: '2026-10-05' },
 
-  // ===================== BLAZERS & COATS =====================
-  {
-    id: 'minimalist-leather-blazer',
-    name: '90s Minimalist Leather Blazer',
-    category: 'blazers-coats', gender: 'women', price: 157.5, mrp: 210, material: LAMB,
-    colors: ['Espresso brown', 'Black', 'Tan'], sizes: JACKET_SIZES, tag: 'Bestseller', featured: true,
-    description: 'An oversized, tailored blazer in buttery lambskin with notch lapels and structured shoulders. Wear it open, or belt it at the waist.',
-    details: ['100% genuine lambskin', 'Notch lapels, flap pockets', 'Structured shoulders', 'Relaxed, oversized fit', 'Made in any colour on request'],
-    images: [etsy('3f10c8', '8455909316', '5n3n'), etsy('0bf2e1', '8495868609', 'toiu'), etsy('5f998e', '8495868581', '141i')],
-    etsyUrl: `${LISTING}4564857892`, createdAt: '2026-08-29',
-  },
-  {
-    id: 'double-breasted-leather-blazer',
-    name: 'Double Breasted Leather Blazer',
-    category: 'blazers-coats', gender: 'men', price: 187.5, mrp: 250, material: LAMB,
-    colors: ['Distressed brown'], sizes: JACKET_SIZES, featured: true,
-    description: 'A 90s-inspired double-breasted blazer in distressed brown leather, with a wide collar and shoulder epaulets.',
-    details: ['Genuine sheep leather', 'Double-breasted front', 'Wide collar, epaulets', 'Two flap pockets', 'Satin lining'],
-    images: [etsy('4c5648', '8668714611', 'bs79'), etsy('2f7ed3', '8620890084', 'fnae'), etsy('d68d4b', '8668713081', 'k8vd'), etsy('489c4d', '8620890228', 'l4j8')],
-    etsyUrl: `${LISTING}4588202862`, createdAt: '2026-10-08',
-  },
-  {
-    id: 'burgundy-belted-leather-blazer',
-    name: 'Burgundy Belted Wrap Blazer',
-    category: 'blazers-coats', gender: 'men', price: 153.75, mrp: 205, material: LAMB,
-    colors: ['Burgundy'], sizes: JACKET_SIZES,
-    description: 'An asymmetric wrap blazer in deep burgundy leather, cinched with a self belt for a sharp, modern line.',
-    details: ['Genuine sheep leather', 'Asymmetric wrap front', 'Self-tie belt', 'Wide lapels', 'Linen-blend lining'],
-    images: [etsy('9f2609', '8385627396', '4rhp'), etsy('9eed69', '8433496241', 'ayd1'), etsy('2b3844', '8433496335', '2snl'), etsy('fbcf69', '8385625142', 'jb3w')],
-    etsyUrl: `${LISTING}4556290801`, createdAt: '2026-08-25',
-  },
-  {
-    id: 'brown-suede-overcoat',
-    name: 'Brown Suede Overcoat',
-    category: 'blazers-coats', gender: 'men', price: 187.5, mrp: 250, material: SUEDE,
-    colors: ['Brown'], sizes: JACKET_SIZES,
-    description: 'A slim-fit suede coat that sits between a blazer and an overcoat — warm, soft and quietly elegant for winter.',
-    details: ['Genuine goatskin suede', 'Slim, tailored fit', 'Notch lapels', 'Button front', 'Satin lining'],
-    images: [etsy('145478', '8492937818', '2fgt'), etsy('579a8f', '8540829373', 'rmrs'), etsy('1ba755', '8540829555', '89yj'), etsy('2a6442', '8540829415', 'kluw')],
-    etsyUrl: `${LISTING}4571175258`, createdAt: '2026-09-08',
-  },
-  {
-    id: 'womens-burgundy-long-blazer',
-    name: "Women's Burgundy Long Blazer",
-    category: 'blazers-coats', gender: 'women', price: 187.5, mrp: 250, material: LAMB,
-    colors: ['Burgundy'], sizes: JACKET_SIZES, tag: 'New',
-    description: 'A long, 90s-inspired tailored blazer in burgundy lambskin — structured shoulders and a clean, elongated line.',
-    details: ['100% genuine lambskin', 'Longline tailored cut', 'Notch lapels', 'Flap pockets', 'Satin lining'],
-    images: [etsy('1764a7', '8507320446', 'fdq4'), etsy('b8e69e', '8507317866', 'mw45'), etsy('39fd7c', '8555194029', '3j73')],
-    etsyUrl: `${LISTING}4573121292`, createdAt: '2026-09-12',
-  },
-  {
-    id: 'womens-hooded-leather-coat',
-    name: "Women's Hooded Leather Coat",
-    category: 'blazers-coats', gender: 'women', price: 225, mrp: 300, material: 'Genuine distressed leather',
-    colors: ['Distressed brown'], sizes: JACKET_SIZES, tag: 'Signature', featured: true,
-    description: 'A long, hooded coat in distressed brown leather — vintage character and serious warmth in one statement piece.',
-    details: ['Genuine distressed leather', 'Long length with hood', 'Metal hardware', 'Front pockets', 'Satin lining'],
-    images: [etsy('00b0dd', '8503154376', '9nv7'), etsy('d532ef', '8503148658', 't2ec'), etsy('6d6e45', '8503148642', 'opiv'), etsy('bb7334', '8503155796', '450g')],
-    etsyUrl: `${LISTING}4572545578`, createdAt: '2026-09-11',
-  },
+  // ===================== WOMEN'S JACKETS (2) =====================
+  { id: 'womens-oversized-bomber-jacket', name: "Women's Oversized Leather Bomber", category: 'womens-jacket', gender: 'women', price: 157.5, mrp: 210, material: LAMB, colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'Oversized bomber.', details: ['Lambskin'], images: [etsy('26898f', '8480296432', 'gffh')], etsyUrl: `${LISTING}4569497006`, createdAt: '2026-09-05' },
+  { id: 'womens-cropped-biker-jacket', name: "Women's Cropped Biker Jacket", category: 'womens-jacket', gender: 'women', price: 157.5, mrp: 210, material: LAMB, colors: ['Black'], sizes: JACKET_SIZES, description: 'Cropped biker.', details: ['Lambskin'], images: [etsy('290b6f', '8550506003', 'mf93')], etsyUrl: `${LISTING}4572475887`, createdAt: '2026-09-10' },
 
-  // ===================== TROUSERS =====================
-  {
-    id: 'slim-leather-trousers',
-    name: 'Slim Fit Leather Trousers',
-    category: 'trousers', gender: 'men', price: 150, mrp: 200, material: LAMB,
-    colors: ['Brown', 'Dark brown', 'Black', 'Blue', 'Gray', 'White'], sizes: TROUSER_SIZES,
-    description: 'Slim, straight leather trousers in soft lambskin with reinforced knee panels — comfortable from the first wear, no stiff break-in.',
-    details: ['100% genuine lambskin', 'YKK zip, metal button closure', 'Reinforced knee panels', 'Slim / straight fit', 'Waist 26–50 or custom'],
-    images: [etsy('7ffd0a', '8491002445', 'nmo2'), etsy('394737', '8443135412', 'a99b'), etsy('c2238c', '8443135594', 'knz3'), etsy('6caef0', '8443135402', 'kn9m')],
-    etsyUrl: `${LISTING}4564214756`, createdAt: '2026-08-28',
-  },
+  // ===================== TRENCH COATS (6) =====================
+  { id: 'minimalist-leather-blazer', name: '90s Minimalist Leather Blazer', category: 'womens-trench-coat', gender: 'women', price: 157.5, mrp: 210, material: LAMB, colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'Blazer.', details: ['Lambskin'], images: [etsy('3f10c8', '8455909316', '5n3n')], etsyUrl: `${LISTING}4564857892`, createdAt: '2026-08-29' },
+  { id: 'double-breasted-leather-blazer', name: 'Double Breasted Leather Blazer', category: 'mens-trench-coat', gender: 'men', price: 187.5, mrp: 250, material: LAMB, colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'Blazer.', details: ['Lambskin'], images: [etsy('4c5648', '8668714611', 'bs79')], etsyUrl: `${LISTING}4588202862`, createdAt: '2026-10-08' },
+  { id: 'burgundy-belted-leather-blazer', name: 'Burgundy Belted Wrap Blazer', category: 'mens-trench-coat', gender: 'men', price: 153.75, mrp: 205, material: LAMB, colors: ['Burgundy'], sizes: JACKET_SIZES, description: 'Blazer.', details: ['Lambskin'], images: [etsy('9f2609', '8385627396', '4rhp')], etsyUrl: `${LISTING}4556290801`, createdAt: '2026-08-25' },
+  { id: 'brown-suede-overcoat', name: 'Brown Suede Overcoat', category: 'mens-trench-coat', gender: 'men', price: 187.5, mrp: 250, material: SUEDE, colors: ['Brown'], sizes: JACKET_SIZES, description: 'Overcoat.', details: ['Suede'], images: [etsy('145478', '8492937818', '2fgt')], etsyUrl: `${LISTING}4571175258`, createdAt: '2026-09-08' },
+  { id: 'womens-burgundy-long-blazer', name: "Women's Burgundy Long Blazer", category: 'womens-trench-coat', gender: 'women', price: 187.5, mrp: 250, material: LAMB, colors: ['Burgundy'], sizes: JACKET_SIZES, description: 'Blazer.', details: ['Lambskin'], images: [etsy('1764a7', '8507320446', 'fdq4')], etsyUrl: `${LISTING}4573121292`, createdAt: '2026-09-12' },
+  { id: 'womens-hooded-leather-coat', name: "Women's Hooded Leather Coat", category: 'womens-trench-coat', gender: 'women', price: 225, mrp: 300, material: 'Distressed leather', colors: ['Brown'], sizes: JACKET_SIZES, featured: true, description: 'Coat.', details: ['Leather'], images: [etsy('00b0dd', '8503154376', '9nv7')], etsyUrl: `${LISTING}4572545578`, createdAt: '2026-09-11' },
 
-  // ===================== VESTS =====================
-  {
-    id: 'lace-up-leather-vest',
-    name: 'Lace-Up Leather Vest',
-    category: 'vests', gender: 'men', price: 142.5, mrp: 190, material: 'Textured genuine leather',
-    colors: ['Black'], sizes: JACKET_SIZES,
-    description: 'A statement vest with a full lace-up front, eyelet-trimmed shoulder straps, a stand collar and adjustable side buckles.',
-    details: ['Textured genuine leather', 'Front lacing with metal grommets', 'Mandarin stand collar', 'Adjustable side buckles', 'V-cut front hem'],
-    images: [etsy('e29410', '8649632413', 'kgww'), etsy('a4539a', '8649610079', 'mm5u'), etsy('98896b', '8601787070', '82cm'), etsy('fc4f3a', '8601786982', 'qt04')],
-    etsyUrl: `${LISTING}4585701490`, createdAt: '2026-09-30',
-  },
+  // ===================== PANTS & VESTS (2) =====================
+  { id: 'slim-leather-trousers', name: 'Slim Fit Leather Trousers', category: 'mens-pant', gender: 'men', price: 150, mrp: 200, material: LAMB, colors: ['Brown'], sizes: TROUSER_SIZES, description: 'Pants.', details: ['Lambskin'], images: [etsy('7ffd0a', '8491002445', 'nmo2')], etsyUrl: `${LISTING}4564214756`, createdAt: '2026-08-28' },
+  { id: 'lace-up-leather-vest', name: 'Lace-Up Leather Vest', category: 'mens-vest', gender: 'men', price: 142.5, mrp: 190, material: 'Leather', colors: ['Black'], sizes: JACKET_SIZES, description: 'Vest.', details: ['Leather'], images: [etsy('e29410', '8649632413', 'kgww')], etsyUrl: `${LISTING}4585701490`, createdAt: '2026-09-30' },
 
-  // ===================== HOME (SEAT PADS) =====================
-  {
-    id: 'round-leather-chair-pad',
-    name: 'Round Leather Chair Pad',
-    category: 'home', gender: 'unisex', price: 60, mrp: 80, material: 'Genuine lambskin, high-density foam',
-    colors: ['Black', 'Tan', 'Red', 'Beige', 'Brown', 'Gray'], sizes: PAD_SIZES, tag: 'Bestseller', featured: true,
-    description: 'A handmade round seat cushion in genuine lambskin over high-density foam, with a stitched edge.',
-    details: ['Genuine lambskin cover', 'High-density foam core', 'Stitched border', 'Sizes 10"–22"', 'Wipe clean with a dry cloth'],
-    images: [etsy('fa036b', '8515187119', '645s'), etsy('263a20', '8511090069', 'j727'), etsy('816858', '8511089981', 'bzco'), etsy('7809d0', '8463230126', '4uri')],
-    etsyUrl: `${LISTING}4446442915`, createdAt: '2026-10-10',
-  },
-  {
-    id: 'eames-chair-leather-cushion',
-    name: 'Leather Cushion for Eames Chair',
-    category: 'home', gender: 'unisex', price: 112.5, mrp: 150, material: 'Genuine leather, foam fill',
-    colors: ['Red', 'Black', 'Tan', 'Beige'], sizes: ['Arm chair', 'Side chair'],
-    description: 'A made-to-fit leather seat cushion for the Eames moulded plastic arm or side chair — adds comfort and a warm, crafted accent.',
-    details: ['Genuine leather cover', 'Foam fill', 'Shaped to the Eames seat', 'Fits arm or side chair', 'Handmade to order'],
-    images: [etsy('59e304', '8690421963', 'tm61'), etsy('4020e1', '8690421663', 'mzua'), etsy('a28d2d', '8690421909', 'slqj')],
-    etsyUrl: `${LISTING}4591001697`, createdAt: '2026-10-14',
-  },
+  // ===================== SEAT PADS (2) =====================
+  { id: 'round-leather-chair-pad', name: 'Round Leather Chair Pad', category: 'seat-pad', gender: 'unisex', price: 60, mrp: 80, material: 'Lambskin', colors: ['Black'], sizes: PAD_SIZES, featured: true, description: 'Pad.', details: ['Lambskin'], images: [etsy('fa036b', '8515187119', '645s')], etsyUrl: `${LISTING}4446442915`, createdAt: '2026-10-10' },
+  { id: 'eames-chair-leather-cushion', name: 'Leather Cushion for Eames Chair', category: 'seat-pad', gender: 'unisex', price: 112.5, mrp: 150, material: 'Leather', colors: ['Red'], sizes: ['Arm chair'], description: 'Cushion.', details: ['Leather'], images: [etsy('59e304', '8690421963', 'tm61')], etsyUrl: `${LISTING}4591001697`, createdAt: '2026-10-14' },
+
+  // ===================== NAYE PRODUCTS (Taaki categories khali na dikhein) =====================
+  { id: 'classic-leather-shirt', name: 'Classic Leather Shirt', category: 'leather-shirt', gender: 'men', price: 140, mrp: 180, material: LAMB, colors: ['Black'], sizes: JACKET_SIZES, description: 'Shirt.', details: ['Lambskin'], images: [etsy('5fadc9', '8412332382', 'faii')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'womens-straight-leather-pants', name: "Women's Straight Leather Pants", category: 'womens-pant', gender: 'women', price: 155, mrp: 195, material: LAMB, colors: ['Black'], sizes: TROUSER_SIZES, description: 'Pants.', details: ['Lambskin'], images: [etsy('7ffd0a', '8491002445', 'nmo2')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'moto-jacket-pant-combo', name: 'Moto Jacket & Pant Combo', category: 'jacket-pant-combo', gender: 'men', price: 280, mrp: 360, material: LAMB, colors: ['Black'], sizes: JACKET_SIZES, description: 'Combo.', details: ['Lambskin'], images: [etsy('267345', '8611484318', 'dzte')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'mens-leather-shorts', name: "Men's Leather Shorts", category: 'mens-shorts', gender: 'men', price: 95, mrp: 130, material: LAMB, colors: ['Black'], sizes: TROUSER_SIZES, description: 'Shorts.', details: ['Lambskin'], images: [etsy('394737', '8443135412', 'a99b')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'womens-leather-shorts', name: "Women's Leather Shorts", category: 'womens-shorts', gender: 'women', price: 95, mrp: 130, material: LAMB, colors: ['Black'], sizes: TROUSER_SIZES, description: 'Shorts.', details: ['Lambskin'], images: [etsy('8443135402', '8443135402', 'kn9m')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'leather-headrest-covers', name: 'Leather Headrest Covers', category: 'leather-headrest-cover', gender: 'unisex', price: 45, mrp: 65, material: 'Leather', colors: ['Black'], sizes: ['Standard'], description: 'Covers.', details: ['Leather'], images: [etsy('fa036b', '8515187119', '645s')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'leather-work-apron', name: 'Leather Work Apron', category: 'apron', gender: 'unisex', price: 85, mrp: 110, material: 'Leather', colors: ['Brown'], sizes: ['One Size'], description: 'Apron.', details: ['Leather'], images: [etsy('145478', '8492937818', '2fgt')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' },
+  { id: 'kids-leather-bomber', name: "Kids' Leather Bomber Jacket", category: 'kids-jacket', gender: 'unisex', price: 110, mrp: 140, material: LAMB, colors: ['Black'], sizes: ['4Y', '6Y'], description: 'Kids jacket.', details: ['Lambskin'], images: [etsy('c2802c', '8243457729', 'lr2j')], etsyUrl: `${LISTING}1234`, createdAt: '2026-10-20' }
 ]

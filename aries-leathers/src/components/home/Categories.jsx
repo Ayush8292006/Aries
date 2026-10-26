@@ -16,7 +16,7 @@ const gridVariants = {
   show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 }
 
-// Taash ke patton jaisa fan — beech wala seedha, kinare wale jhuke hue
+// Taash ke patton jaisa fan
 const cardVariants = {
   hidden: (i) => ({
     opacity: 0,

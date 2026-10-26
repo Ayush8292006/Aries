@@ -1,172 +1,280 @@
-import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Container from '../ui/Container'
-import SplitReveal from '../motion/SplitReveal'
-import { SPOTLIGHT } from '../../data/home'
-import jacketImg from '../../assets/signature-jacket.png'
+import { SEED_PRODUCTS } from '../../data/products' // <- apne products file ka sahi path
 
 const EASE = [0.22, 1, 0.36, 1]
 
-/** Khoobi card — jacket ke side mein */
-function Feature({ progress, start, index, title, text, align }) {
-  const opacity = useTransform(progress, [start, start + 0.08], [0, 1])
-  const x = useTransform(progress, [start, start + 0.08], [align === 'left' ? -50 : 50, 0])
+// PageTransition.jsx bhi inhi keys ko padhta hai
+export const RETURN_KEY = 'aries_return_scroll'
+export const REVEAL_KEY = 'aries_reveal'
+
+const featured = SEED_PRODUCTS.filter((p) => p.featured)
+const RACK = featured.length >= 5 ? featured : SEED_PRODUCTS.slice(0, 8)
+const COUNT = RACK.length
+const STEP = (Math.PI * 2) / COUNT
+
+const productUrl = (p) => `/products/${p.id}` // <- apna product route
+
+/** Gol ring par ghoomta card. theta = 0 -> bilkul saamne */
+function RackCard({ product, index, p, onPick }) {
+  const [hovered, setHovered] = useState(false)
+
+  const theta = useTransform(p, (v) => (index - v) * STEP)
+  const depth = useTransform(theta, (t) => (Math.cos(t) + 1) / 2)
+
+  const x = useTransform(theta, (t) => `calc(var(--rx) * ${Math.sin(t).toFixed(4)})`)
+  const y = useTransform(theta, (t) => `calc(var(--ry) * ${Math.cos(t).toFixed(4)})`)
+
+  // ---- Hover spring (0 -> 1), drives all hover effects on the motion track ----
+  const hoverMV = useMotionValue(0)
+  useEffect(() => {
+    hoverMV.set(hovered ? 1 : 0)
+  }, [hovered, hoverMV])
+  const hoverSpring = useSpring(hoverMV, { stiffness: 300, damping: 24, mass: 0.5 })
+
+  // Base scale from depth + hover lift on top
+  const baseScale = useTransform(depth, (d) => 0.55 + d * 0.8)
+  const scale = useTransform([baseScale, hoverSpring], ([s, h]) => s * (1 + h * 0.12))
+
+  const opacity = useTransform(depth, (d) => 0.15 + 0.85 * Math.pow(d, 1.6))
+  const zIndex = useTransform([depth, hoverSpring], ([d, h]) => Math.round(d * 100) + (h > 0.5 ? 50 : 0))
+
+  // Inner image zoom
+  const imgScale = useTransform(hoverSpring, (h) => 1 + h * 0.14)
+  const overlayOpacity = useTransform(hoverSpring, [0, 1], [0, 1])
+
+  // Shadow elevation
+  const boxShadow = useTransform(
+    hoverSpring,
+    [0, 1],
+    [
+      '0 8px 24px -8px rgba(0,0,0,0.35)',
+      '0 24px 60px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06)',
+    ],
+  )
 
   return (
-    <motion.div
-      style={{ opacity, x }}
-      className={`border border-gold/25 bg-ink-light/70 p-6 backdrop-blur-sm ${align === 'right' ? 'text-right' : ''}`}
+    <motion.button
+      type="button"
+      data-card={product.id}
+      onClick={() => onPick(index)}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+      aria-label={product.name}
+      style={{
+        x,
+        y,
+        scale,
+        opacity,
+        zIndex,
+        boxShadow,
+        width: 'var(--cw)',
+        marginLeft: 'calc(var(--cw) / -2)',
+        marginTop: 'calc(var(--cw) * -0.667)',
+        top: 'var(--cy)',
+      }}
+      className="absolute left-1/2 aspect-3/4 cursor-pointer overflow-hidden bg-ink-light will-change-transform"
     >
-      <div className={`flex items-center gap-3 ${align === 'right' ? 'flex-row-reverse' : ''}`}>
-        <span className="font-display text-sm text-gold">{String(index + 1).padStart(2, '0')}</span>
-        <span className="h-px w-10 bg-gold/60" />
-      </div>
-      <p className="mt-3 font-display text-2xl text-bone xl:text-3xl">{title}</p>
-      <p className="mt-2 text-[15px] leading-relaxed text-bone/85">{text}</p>
-    </motion.div>
+      {/* Image with smooth inner zoom */}
+      <motion.img
+        src={product.images[0]}
+        alt={product.name}
+        draggable={false}
+        loading="lazy"
+        style={{ scale: imgScale }}
+        className="h-full w-full object-cover"
+      />
+
+      {/* Premium gradient overlay — fades in on hover */}
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          opacity: overlayOpacity,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%)',
+        }}
+      />
+
+      {/* Subtle inner border shine */}
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          opacity: overlayOpacity,
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
+        }}
+      />
+    </motion.button>
   )
 }
 
 export default function Spotlight() {
   const ref = useRef(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
-
-  // Spring = makkhan jaisa smooth, scroll kitna bhi jhatke se ho
-  const smooth = useSpring(scrollYProgress, { stiffness: 70, damping: 22, mass: 0.6 })
-
-  // Jacket baayein-daayein ghoomti hai aur end mein seedhi ruk jaati hai
-  const rotateY = useTransform(smooth, [0, 0.3, 0.6, 0.85, 1], [-40, 32, -22, 0, 0])
-  const rotateX = useTransform(smooth, [0, 0.5, 1], [10, 2, 0])
-  const scale = useTransform(smooth, [0, 0.15, 0.85, 1], [0.82, 1, 1, 0.96])
-  const floatY = useTransform(smooth, [0, 0.25, 0.5, 0.75, 1], [30, -10, 8, -6, 0])
-
-  // Ghoomne ke saath chamak aur shadow
-  const sheenX = useTransform(rotateY, [-40, 40], ['-60%', '60%'])
-  const shadowScale = useTransform(rotateY, [-40, 0, 40], [0.75, 1, 0.75])
-  const glow = useTransform(smooth, [0, 0.2], [0.2, 1])
-
-  const ctaOpacity = useTransform(smooth, [0.82, 0.95], [0, 1])
-  const ctaY = useTransform(smooth, [0.82, 0.95], [30, 0])
-
-  // Phone ke liye: abhi kaunsi khoobi dikhe
+  const navigate = useNavigate()
+  const navType = useNavigationType()
+  const { pathname } = useLocation()
   const [active, setActive] = useState(0)
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const i = Math.min(SPOTLIGHT.features.length - 1, Math.max(0, Math.floor((v - 0.1) / 0.18)))
-    setActive(i)
+  const [opening, setOpening] = useState(null)
+
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
+  const smooth = useSpring(scrollYProgress, { stiffness: 70, damping: 24, mass: 0.6 })
+  const p = useTransform(smooth, [0, 1], [0, COUNT - 1])
+
+  useMotionValueEvent(p, 'change', (v) => {
+    setActive(Math.min(COUNT - 1, Math.max(0, Math.round(v))))
   })
 
-  const features = SPOTLIGHT.features
-  const starts = [0.1, 0.28, 0.46, 0.64]
+  // Back par scroll restore hone tak spring ko seedha jump karao (rack ghoomta na dikhe)
+  const settling = useRef(navType === 'POP')
+  const timer = useRef(null)
+  if (settling.current && !timer.current && typeof window !== 'undefined') {
+    timer.current = setTimeout(() => (settling.current = false), 1200)
+  }
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    if (settling.current) smooth.jump(v)
+  })
 
-  const jacket = (
-    <div className="relative mx-auto w-[72vw] max-w-[440px] lg:w-[30vw]" style={{ perspective: 1400 }}>
-      {/* Studio light */}
-      <motion.div
-        aria-hidden
-        style={{ opacity: glow }}
-        className="absolute left-1/2 top-1/2 -z-10 h-[130%] w-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(176,141,87,0.25),transparent_62%)]"
-      />
+  const goTo = (i) => {
+    const el = ref.current
+    if (!el) return
+    const range = el.offsetHeight - window.innerHeight
+    const target = Math.min(COUNT - 1, Math.max(0, i))
+    const top = el.offsetTop + (range * target) / (COUNT - 1)
+    const lenis = window.__lenis
+    if (lenis) lenis.scrollTo(top, { duration: 1.1 })
+    else window.scrollTo({ top, behavior: 'smooth' })
+  }
 
-      <motion.div style={{ rotateY, rotateX, scale, y: floatY, transformStyle: 'preserve-3d' }} className="relative">
-        <div
-          className="relative aspect-square overflow-hidden"
-          style={{
-            WebkitMaskImage: 'radial-gradient(ellipse 62% 66% at 50% 48%, #000 58%, transparent 100%)',
-            maskImage: 'radial-gradient(ellipse 62% 66% at 50% 48%, #000 58%, transparent 100%)',
-          }}
-        >
-          <img src={jacketImg} alt="Aries signature leather jacket" className="h-full w-full object-cover" draggable={false} />
-          {/* Ghoomti chamak */}
-          <motion.span
-            aria-hidden
-            style={{ x: sheenX }}
-            className="pointer-events-none absolute inset-y-0 left-1/4 w-1/2 skew-x-[-15deg] bg-linear-to-r from-transparent via-white/15 to-transparent mix-blend-screen"
-          />
-        </div>
-      </motion.div>
+  const openProduct = (i) => {
+    const product = RACK[i]
+    const to = productUrl(product)
+    try {
+      sessionStorage.setItem(RETURN_KEY, JSON.stringify({ path: pathname, y: window.scrollY }))
+    } catch {
+      /* ignore */
+    }
 
-      {/* Zameen par shadow */}
-      <motion.div
-        aria-hidden
-        style={{ scaleX: shadowScale }}
-        className="mx-auto -mt-6 h-8 w-3/4 rounded-[50%] bg-black/80 blur-2xl"
-      />
-    </div>
-  )
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const el = document.querySelector(`[data-card="${product.id}"]`)
+    if (reduce || !el) return navigate(to)
+
+    try {
+      sessionStorage.setItem(REVEAL_KEY, '1')
+    } catch {
+      /* ignore */
+    }
+    const r = el.getBoundingClientRect()
+    setOpening({ rect: { top: r.top, left: r.left, width: r.width, height: r.height }, src: product.images[0], to })
+  }
+
+  const onPick = (i) => (i === active ? openProduct(i) : goTo(i))
+  const current = RACK[active]
 
   return (
-    <section ref={ref} className="relative h-[320vh] bg-ink text-bone">
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden">
-        <Container className="flex h-full flex-col pb-8 pt-20 md:pb-10 md:pt-24">
-          {/* ===== Title ===== */}
-          <div className="text-center lg:text-left">
-            <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-gold">Signature piece</p>
-            <h2 className="mt-3 font-display text-4xl tracking-tight text-bone md:text-6xl">
-              <SplitReveal text={`The ${SPOTLIGHT.name}`} />
-            </h2>
+    <section ref={ref} className="relative bg-ink text-bone" style={{ height: `${COUNT * 55 + 100}vh` }}>
+      <div
+        className="sticky top-0 h-svh overflow-hidden"
+        style={{
+          '--cw': 'clamp(92px, min(12vw, 15svh), 150px)',
+          '--rx': 'min(34vw, 460px)',
+          '--ry': 'min(13svh, 150px)',
+          '--cy': 'calc(100% - var(--ry) - var(--cw) * 0.9 - 12px)',
+        }}
+      >
+        <Container className="grid h-full grid-rows-[auto_minmax(0,1fr)_auto] pb-6 pt-20 md:pt-24">
+          {/* Counter */}
+          <p className="relative z-30 bg-ink pb-3 text-center font-display text-3xl leading-none md:text-4xl">
+            {active + 1}
+            <span className="text-bone/35"> / {COUNT}</span>
+          </p>
+
+          {/* Rack */}
+          <div className="relative min-h-0 overflow-hidden">
+            {RACK.map((product, i) => (
+              <RackCard key={product.id} product={product} index={i} p={p} onPick={onPick} />
+            ))}
           </div>
 
-          {/* ===== Laptop: khoobi · jacket · khoobi ===== */}
-          <div className="hidden flex-1 items-center gap-10 lg:grid lg:grid-cols-[1fr_auto_1fr] xl:gap-16">
-            <div className="space-y-6">
-              {features.slice(0, 2).map((f, i) => (
-                <Feature key={f.title} progress={smooth} start={starts[i]} index={i} align="left" {...f} />
-              ))}
-            </div>
-            {jacket}
-            <div className="space-y-6">
-              {features.slice(2).map((f, i) => (
-                <Feature key={f.title} progress={smooth} start={starts[i + 2]} index={i + 2} align="right" {...f} />
-              ))}
-            </div>
-          </div>
-
-          {/* ===== Phone / tablet: jacket + ek khoobi ===== */}
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 lg:hidden">
-            {jacket}
-            <div className="relative h-[120px] w-full max-w-md">
+          {/* Info */}
+          <div className="relative z-30 flex flex-col items-center gap-4 bg-ink pt-4">
+            <div className="h-[50px] text-center">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={active}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={current.id}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className="absolute inset-0 border border-gold/25 bg-ink-light/70 p-5 text-center backdrop-blur-sm"
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: EASE }}
                 >
-                  <p className="font-display text-sm text-gold">
-                    {String(active + 1).padStart(2, '0')} / {String(features.length).padStart(2, '0')}
-                  </p>
-                  <p className="mt-1 font-display text-xl text-bone">{features[active].title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-bone/85">{features[active].text}</p>
+                  <p className="font-display text-xl leading-tight md:text-2xl">{current.name}</p>
+                  <p className="mt-1 text-sm text-bone/65">${current.price.toFixed(2)}</p>
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
 
-          {/* ===== CTA ===== */}
-          <motion.div
-            style={{ opacity: ctaOpacity, y: ctaY }}
-            className="flex flex-col items-center justify-between gap-4 sm:flex-row"
-          >
-            <p className="text-center text-sm text-bone/80 sm:text-left">
-              Distressed full-grain leather · Plaid flannel lining · Made to measure
-            </p>
-            <Link
-              to="/products?category=jackets"
-              className="group relative inline-flex items-center gap-3 overflow-hidden bg-bone px-8 py-4 text-[12px] font-medium uppercase tracking-[0.2em] text-ink"
-            >
-              <span className="absolute inset-0 -translate-x-full bg-oxblood transition-transform duration-500 ease-out group-hover:translate-x-0" />
-              <span className="relative flex items-center gap-3 transition-colors duration-500 group-hover:text-bone">
-                Shop jackets
-                <ArrowRight size={15} strokeWidth={1.5} className="transition-transform duration-500 group-hover:translate-x-1" />
-              </span>
-            </Link>
-          </motion.div>
+            <div className="flex items-center gap-6">
+              <button
+                type="button"
+                onClick={() => goTo(active - 1)}
+                disabled={active === 0}
+                aria-label="Previous"
+                className="p-2 text-bone/70 transition-colors hover:text-bone disabled:opacity-25"
+              >
+                <ArrowLeft size={20} strokeWidth={1.25} />
+              </button>
+              <button
+                type="button"
+                onClick={() => openProduct(active)}
+                className="bg-bone px-9 py-3.5 text-sm font-medium text-ink transition-colors duration-300 hover:bg-oxblood hover:text-bone"
+              >
+                View item
+              </button>
+              <button
+                type="button"
+                onClick={() => goTo(active + 1)}
+                disabled={active === COUNT - 1}
+                aria-label="Next"
+                className="p-2 text-bone/70 transition-colors hover:text-bone disabled:opacity-25"
+              >
+                <ArrowRight size={20} strokeWidth={1.25} />
+              </button>
+            </div>
+          </div>
         </Container>
       </div>
+
+      {/* Card phailkar poori screen banta hai, phir page khulta hai */}
+      <AnimatePresence>
+        {opening && (
+          <motion.div
+            key="opening"
+            className="fixed z-[200] overflow-hidden bg-ink"
+            initial={{ ...opening.rect }}
+            animate={{ top: 0, left: 0, width: '100vw', height: '100svh' }}
+            transition={{ duration: 0.7, ease: EASE }}
+            onAnimationComplete={() => navigate(opening.to)}
+          >
+            <img src={opening.src} alt="" className="h-full w-full object-cover" />
+            <motion.div
+              className="absolute inset-0 bg-ink"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

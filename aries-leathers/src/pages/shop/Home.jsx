@@ -1,4 +1,4 @@
-import VideoHero from '../../components/sections/VideoHero'
+import ClotheslineHero from '../../components/home/ClotheslineHero'
 import Intro from '../../components/home/Intro'
 import Spotlight from '../../components/home/Spotlight'
 import Categories from '../../components/home/Categories'
@@ -11,22 +11,24 @@ import FinalCta from '../../components/home/FinalCta'
 
 export default function Home() {
   return (
-    <>
-      {/* 1. Video */}
-      <VideoHero />
+    <div className="relative">
+      {/* 🔥 Sticky Wrapper: Ye ClotheslineHero ko screen par fix rakhega */}
+      <div className="sticky top-0 h-screen w-full z-0 overflow-hidden">
+        <ClotheslineHero />
+      </div>
 
-      {/* 2. Categories — video ke turant baad */}
-      <Categories />
-
-      {/* 3. Baaki sections */}
-      <Intro />
-      <Spotlight />
-      <Trending />
-      <Craft />
-      <Story />
-      <Worldwide />
-      <Promises />
-      <FinalCta />
-    </>
+      {/* 🔥 Baaki ka content jo upar se slide hokar aayega */}
+      <div className="relative z-10 bg-ivory shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
+        <Categories />
+        <Intro />
+        <Spotlight />
+        <Trending />
+        <Craft />
+        <Story />
+        <Worldwide />
+        <Promises />
+        <FinalCta />
+      </div>
+    </div>
   )
 }

@@ -11,6 +11,16 @@ import { CATEGORIES } from '../../config/site'
 
 const EASE = [0.22, 1, 0.36, 1]
 
+const isOnSale = (product) => {
+  return product.mrp && product.mrp > product.price
+}
+
+const ALL_CATEGORIES = [
+  { slug: 'all', name: 'All' },
+  { slug: 'on-sale', name: 'On sale' },
+  ...CATEGORIES,
+]
+
 const GENDERS = [
   { value: 'all', label: 'All' },
   { value: 'men', label: 'Men' },
@@ -35,7 +45,6 @@ function matchesQuery(p, q) {
   return q.toLowerCase().split(/\s+/).every((word) => haystack.includes(word))
 }
 
-/** Value badalne par text roll hota hai */
 function Rolling({ value }) {
   return (
     <span className="relative inline-flex overflow-hidden align-bottom">
@@ -55,14 +64,13 @@ function Rolling({ value }) {
   )
 }
 
-/* ================= FILTER PANEL ================= */
 function FilterPanel({ id, category, gender, priceCap, maxBase, counts, onCategory, onGender, onPrice, onClear, formatPrice }) {
   return (
     <div className="space-y-10">
       <div>
         <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-ink">Category</p>
         <ul className="mt-4 space-y-1">
-          {[{ slug: 'all', name: 'All products' }, ...CATEGORIES].map((c) => {
+          {ALL_CATEGORIES.map((c) => {
             const active = category === c.slug
             return (
               <li key={c.slug}>
@@ -80,7 +88,9 @@ function FilterPanel({ id, category, gender, priceCap, maxBase, counts, onCatego
                     />
                   )}
                   <span className="relative">{c.name}</span>
-                  <span className={`relative text-xs ${active ? 'text-bone/60' : 'text-muted'}`}>{counts[c.slug] ?? 0}</span>
+                  <span className={`relative text-xs ${active ? 'text-bone/60' : 'text-muted'}`}>
+                    {counts[c.slug] ?? 0}
+                  </span>
                 </button>
               </li>
             )
@@ -149,7 +159,6 @@ function FilterPanel({ id, category, gender, priceCap, maxBase, counts, onCatego
   )
 }
 
-/* ================= PAGE ================= */
 export default function Products({ searchMode = false }) {
   const { products } = useProducts()
   const { formatPrice } = useCurrency()
@@ -175,8 +184,11 @@ export default function Products({ searchMode = false }) {
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(params)
-    if (!value || value === 'all' || (key === 'sort' && value === 'featured')) next.delete(key)
-    else next.set(key, value)
+    if (!value || value === 'all' || (key === 'sort' && value === 'featured')) {
+      next.delete(key)
+    } else {
+      next.set(key, value)
+    }
     setParams(next, { replace: true })
   }
 
@@ -188,21 +200,29 @@ export default function Products({ searchMode = false }) {
   }
 
   const counts = useMemo(() => {
-    const c = { all: products.length }
+    const c = { all: products.length, 'on-sale': 0 }
     products.forEach((p) => {
       c[p.category] = (c[p.category] ?? 0) + 1
+      if (isOnSale(p)) c['on-sale'] += 1
     })
     return c
   }, [products])
 
   const results = useMemo(() => {
-    let list = products.filter(
-      (p) =>
-        (category === 'all' || p.category === category) &&
+    let list = products.filter((p) => {
+      if (category === 'on-sale') {
+        if (!isOnSale(p)) return false
+      } else if (category !== 'all' && p.category !== category) {
+        return false
+      }
+      
+      return (
         (gender === 'all' || p.gender === gender || p.gender === 'unisex') &&
         (priceCap == null || p.price <= priceCap) &&
         (!q || matchesQuery(p, q))
-    )
+      )
+    })
+
     if (sort === 'new') list = [...list].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price)
     if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price)
@@ -210,8 +230,8 @@ export default function Products({ searchMode = false }) {
     return list
   }, [products, category, gender, priceCap, q, sort])
 
-  const categoryName = CATEGORIES.find((c) => c.slug === category)?.name
-  const title = searchMode ? (q ? `Results for “${q}”` : 'Search') : categoryName ?? 'All products'
+  const categoryName = ALL_CATEGORIES.find((c) => c.slug === category)?.name
+  const title = searchMode ? (q ? `Results for "${q}"` : 'Search') : categoryName ?? 'All products'
   const gridClass = GRID_OPTIONS.find((g) => g.cols === gridCols)?.className
 
   const panelProps = {
@@ -234,7 +254,6 @@ export default function Products({ searchMode = false }) {
 
   return (
     <>
-      {/* ===== Header ===== */}
       <section className="relative overflow-hidden border-b border-line bg-ivory">
         <p
           aria-hidden
@@ -288,7 +307,6 @@ export default function Products({ searchMode = false }) {
             </motion.form>
           )}
 
-          {/* Category tabs */}
           <motion.div
             initial="hidden"
             animate="show"
@@ -296,11 +314,12 @@ export default function Products({ searchMode = false }) {
             className="mt-10 flex gap-2 overflow-x-auto pb-1"
             data-lenis-prevent
           >
-            {[{ slug: 'all', name: 'All' }, ...CATEGORIES].map((c) => {
+            {ALL_CATEGORIES.map((c) => {
               const active = category === c.slug
               return (
                 <motion.button
                   key={c.slug}
+                  type="button"
                   variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setParam('category', c.slug)}
@@ -321,7 +340,6 @@ export default function Products({ searchMode = false }) {
         </Container>
       </section>
 
-      {/* ===== Body ===== */}
       <section className="bg-bone">
         <Container className="grid gap-12 py-12 lg:grid-cols-12 lg:py-16">
           <motion.aside
@@ -336,7 +354,6 @@ export default function Products({ searchMode = false }) {
           </motion.aside>
 
           <div className="lg:col-span-9">
-            {/* Toolbar */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -356,6 +373,7 @@ export default function Products({ searchMode = false }) {
                   return (
                     <button
                       key={cols}
+                      type="button"
                       role="radio"
                       aria-checked={active}
                       aria-label={`${cols} columns`}
@@ -383,9 +401,8 @@ export default function Products({ searchMode = false }) {
               </label>
             </motion.div>
 
-            {/* Grid */}
             {results.length > 0 ? (
-              <motion.div layout className={`grid gap-x-4 gap-y-14 md:gap-x-6 ${gridClass}`} style={{ perspective: 1400 }}>
+              <motion.div layout className={`grid gap-x-2 gap-y-8 md:gap-x-3 ${gridClass}`} style={{ perspective: 1400 }}>
                 <AnimatePresence mode="popLayout">
                   {results.map((p, i) => (
                     <motion.div
@@ -429,7 +446,6 @@ export default function Products({ searchMode = false }) {
         </Container>
       </section>
 
-      {/* ===== Mobile filter drawer ===== */}
       <AnimatePresence>
         {drawerOpen && (
           <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
