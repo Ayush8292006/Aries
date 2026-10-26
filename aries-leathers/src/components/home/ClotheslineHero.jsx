@@ -18,7 +18,7 @@ export default function ClotheslineHero() {
     <section className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-[#1a1a1a] pt-28 text-bone md:pt-20">
       
       {/* Header */}
-      <div className="relative z-10 mx-auto mt-4 max-w-3xl px-6 text-center md:mt-10">
+      <div className="relative z-10 mx-auto mt-10 max-w-3xl px-6 text-center md:mt-16">
         <p className="text-[9px] font-medium uppercase tracking-[0.3em] text-bone/60 md:text-[10px]">
           New Collection — Premium Streetwear
         </p>
@@ -27,24 +27,24 @@ export default function ClotheslineHero() {
         </h1>
       </div>
 
-      {/* Clothesline Area (Products ko upar shift kiya) */}
-      <div className="relative mt-4 flex w-full items-start justify-center overflow-hidden pb-10 md:mt-10 md:pb-20">
+      {/* Clothesline Area */}
+      <div className="relative my-auto flex w-full items-center justify-center overflow-hidden py-10 md:py-20">
         
-        {/* Rope (SVG Curve) - Adjusted for new position */}
+        {/* Rope (SVG Curve) */}
         <svg
-          className="absolute top-[-20px] h-32 w-[200vw] min-w-[1200px] md:top-[-10px] md:w-[150vw]"
+          className="absolute top-1/2 h-32 w-[200vw] min-w-[1200px] -translate-y-1/2 md:h-40 md:w-[150vw]"
           viewBox="0 0 1200 100"
           preserveAspectRatio="none"
         >
-          <path d="M 0 20 Q 600 140 1200 20" fill="none" stroke="#444" strokeWidth="2.5" />
+          <path d="M 0 10 Q 600 100 1200 10" fill="none" stroke="#444" strokeWidth="2.5" />
         </svg>
 
         {/* Infinite Loop Container */}
         <motion.div
-          className="flex items-start"
+          className="flex items-center"
           animate={{ x: ['0%', '-50%'] }}
           transition={{
-            duration: 30, // Speed (kam karein toh tez chalega)
+            duration: 40,
             ease: 'linear',
             repeat: Infinity,
             repeatType: 'loop'
@@ -53,8 +53,9 @@ export default function ClotheslineHero() {
           {displayProducts.map((product, i) => {
             const cycleIndex = i % 10
             const progress = cycleIndex / 9 
-            // U-Shape (Parabola) Curve
-            const curveY = Math.sin(progress * Math.PI) * 50 
+            
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+            const curveY = Math.pow(progress - 0.5, 2) * (isMobile ? 160 : 180); 
 
             return (
               <div
@@ -75,15 +76,15 @@ export default function ClotheslineHero() {
                   }}
                   whileHover={{ scale: 1.05, rotate: 0 }}
                 >
-                  {/* Hanger (Thoda chhota kiya) */}
+                  {/* Hanger */}
                   <div className="flex flex-col items-center scale-75 md:scale-90">
                     <div className="h-6 w-px bg-white/30" />
                     <div className="h-3 w-3 rounded-full border border-white/40 bg-transparent" />
                     <div className="h-8 w-16 rounded-t-full border-t-2 border-white/50" />
-                    <div className="h-4 w-20" /> {/* Gap kam kiya */}
+                    <div className="h-4 w-20" />
                   </div>
 
-                  {/* Product Image (Upar shift kiya -mt-8 se) */}
+                  {/* Product Image */}
                   <div className="group relative -mt-6 aspect-[3/4] w-[90px] overflow-hidden bg-[#2a2a2a] md:-mt-8 md:w-[130px] lg:w-[160px]">
                     <img
                       src={product.images[0]}
@@ -140,9 +141,12 @@ export default function ClotheslineHero() {
               transition={{ type: 'spring', damping: 26, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
             >
+              
+              {/* 🔥 YAHAN CLOSE BUTTON FIX HUA HAI 🔥 */}
               <button
                 onClick={() => setSelected(null)}
-                className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-ink/80 text-bone backdrop-blur transition-colors hover:bg-oxblood"
+                className="absolute right-4 top-16 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-transform hover:scale-110 md:top-4 md:bg-ink/80"
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
