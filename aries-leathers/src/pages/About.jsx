@@ -16,7 +16,6 @@ import { SITE } from '../config/site'
 
 const EASE = [0.22, 1, 0.36, 1]
 
-// Sirf asli tathya — aapki Etsy shop ke "About" se
 const TIMELINE = [
   { year: '1992', title: 'The first cutting table', text: 'Anwar Ansari begins working with leather in Mumbai — a trade that becomes the family’s craft.' },
   { year: '30 years', title: 'A workshop of masters', text: 'Tailors with three decades at the bench join the workshop. Every pattern is still drawn by hand.' },
@@ -24,7 +23,6 @@ const TIMELINE = [
   { year: '2026', title: '177 designs and counting', text: 'Jackets, blazers, trousers, vests and seat pads — every one still made to order.' },
 ]
 
-// Asli 5★ reviews — Etsy shop se
 const REVIEWS = [
   { name: 'Paul', text: 'The jacket is what I expected and is a great color and fit.', item: 'Lambskin leather jacket' },
   { name: 'Alex', text: 'Item came in quick and it was a perfect fit!', item: 'Red leather bomber' },
@@ -97,7 +95,8 @@ function Statement() {
     <section ref={ref} className="overflow-hidden bg-bone py-24 md:py-36">
       <Container className="grid items-center gap-10 md:grid-cols-12">
         <motion.div style={{ y: yUp }} className="hidden md:col-span-3 md:block">
-          <SmartImage src={CATEGORY_IMAGES['blazers-coats']} alt="" className="aspect-[3/4] w-full" />
+          {/* 🔥 FIX: Nayi category slug use ki hai */}
+          <SmartImage src={CATEGORY_IMAGES['mens-trench-coat']} alt="" className="aspect-[3/4] w-full" />
         </motion.div>
 
         <div className="text-center md:col-span-6">
@@ -117,7 +116,8 @@ function Statement() {
         </div>
 
         <motion.div style={{ y: yDown }} className="hidden md:col-span-3 md:block">
-          <SmartImage src={CATEGORY_IMAGES.jackets} alt="" className="aspect-[3/4] w-full" />
+          {/* 🔥 FIX: Nayi category slug use ki hai */}
+          <SmartImage src={CATEGORY_IMAGES['mens-jacket']} alt="" className="aspect-[3/4] w-full" />
         </motion.div>
       </Container>
     </section>
