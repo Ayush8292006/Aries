@@ -11,7 +11,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 const EASE = [0.22, 1, 0.36, 1]
 
-/* ===== Hover par text roll hota hai (upar jaata hai, neeche se gold aata hai) ===== */
+/* ===== Hover par text roll hota hai ===== */
 function RollText({ children, active = false }) {
   return (
     <span className="relative block overflow-hidden leading-[1.3]">
@@ -117,7 +117,14 @@ function NavLinks() {
   return (
     <nav className="hidden items-center gap-9 lg:flex" aria-label="Main">
       {NAV_LINKS.map((link) => {
-        const isActive = link.to === '/' ? pathname === '/' : pathname.startsWith(link.to)
+        // 🔥 FIX: Active link check logic
+        let isActive = false;
+        if (link.to === '/') {
+          isActive = pathname === '/';
+        } else {
+          isActive = pathname === link.to || pathname.startsWith(link.to + '/');
+        }
+
         return (
           <NavLink
             key={link.to}
@@ -138,7 +145,7 @@ function NavLinks() {
   )
 }
 
-/* ===== Mobile drawer (halka rang) ===== */
+/* ===== Mobile drawer ===== */
 function MobileMenu({ open, onClose, actions }) {
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''

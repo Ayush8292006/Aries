@@ -24,6 +24,7 @@ const LINKS = [
   { label: 'My Orders', to: '/orders' },
   { label: 'Favourites', to: '/wishlist' },
   { label: 'Cart', to: '/cart' },
+    { label: 'Blog', to: '/blog' },
 ]
 
 const fadeUp = {

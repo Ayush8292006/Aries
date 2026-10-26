@@ -19,13 +19,21 @@ import Signup from './pages/auth/Signup'
 import ComingSoon from './pages/ComingSoon'
 import NotFound from './pages/NotFound'
 
+import Blog from './pages/blog/Blog'
+import BlogPost from './pages/blog/BlogPost'
+import FAQ from './pages/Faq'
+
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Home />} />
-                <Route path="about" element={<About />} />
+        <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+
+                <Route path="blog" element={<Blog />} />
+        <Route path="blog/:slug" element={<BlogPost />} />
+        <Route path="faq" element={<FAQ />} />
 
         {/* Shop */}
         <Route path="products" element={<Products />} />

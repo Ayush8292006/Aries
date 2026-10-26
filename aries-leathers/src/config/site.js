@@ -18,6 +18,8 @@ export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
   { label: 'Products', to: '/products' },
+    { label: 'Blog', to: '/blog' },     // 🔥 Naya Link
+  { label: 'FAQ', to: '/faq' },        // 🔥 Naya Link
   { label: 'Contact', to: '/contact' },
 ]
 

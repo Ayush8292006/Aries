@@ -17,6 +17,8 @@ const THEMES = {
 
 // Route ka shuruaati hissa → theme. Home ('/') default rang mein rehta hai.
 const ROUTE_THEMES = [
+    ['/blog/', 'linen'], // article page
+  ['/blog', 'almond'], // blog list
   ['/products/', 'linen'], // product detail (pehle check hota hai)
   ['/products', 'clay'],
   ['/search', 'clay'],
