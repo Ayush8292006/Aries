@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+import { usePromotions } from '../../hooks/usePromotions'
+
 const MESSAGES = [
   'Complimentary shipping on qualifying orders',
   'Handcrafted since 1992',
@@ -7,13 +10,17 @@ const MESSAGES = [
   '4.8★ rated on Etsy',
 ]
 
-function Row() {
+function Row({ items }) {
   return (
     <div className="flex shrink-0 items-center">
-      {MESSAGES.map((m) => (
-        <span key={m} className="flex items-center">
-          <span className="px-8 text-[11px] font-medium uppercase tracking-[0.28em] text-ink/80 transition-colors duration-300 hover:text-oxblood">
-            {m}
+      {items.map((m, i) => (
+        <span key={`${m.text}-${i}`} className="flex items-center">
+          <span
+            className={`px-8 text-[11px] font-medium uppercase tracking-[0.28em] transition-colors duration-300 hover:text-oxblood ${
+              m.highlight ? 'font-semibold text-oxblood' : 'text-ink/80'
+            }`}
+          >
+            {m.text}
           </span>
           <span className="ann-star text-[10px] text-oxblood">✦</span>
         </span>
@@ -23,6 +30,19 @@ function Row() {
 }
 
 export default function AnnouncementBar() {
+  const { liveSales } = usePromotions()
+
+  // Chal rahi sales ke message sabse pehle, oxblood mein
+  const items = useMemo(() => {
+    const saleMessages = liveSales
+      .filter((s) => s.showBanner)
+      .map((s) => ({
+        text: s.bannerText?.trim() || `${s.name} — ${s.percent}% off ${s.scope === 'all' ? 'everything' : 'selected pieces'}`,
+        highlight: true,
+      }))
+    return [...saleMessages, ...MESSAGES.map((text) => ({ text }))]
+  }, [liveSales])
+
   return (
     <div className="ann-bar relative overflow-hidden border-b border-line bg-[#F8F4EE]">
       <style>{`
@@ -44,8 +64,8 @@ export default function AnnouncementBar() {
       <span className="pointer-events-none absolute inset-y-0 right-0 z-20 w-20 bg-linear-to-l from-[#F8F4EE] to-transparent" />
 
       <div className="ann-track flex w-max py-2.5">
-        <Row />
-        <Row />
+        <Row items={items} />
+        <Row items={items} />
       </div>
     </div>
   )

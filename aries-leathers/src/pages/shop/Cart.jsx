@@ -83,7 +83,7 @@ function EmptyCart() {
 }
 
 export default function Cart() {
-  const { lines, totals, updateQty, removeItem, moveToWishlist, applyPromo, removePromo } = useCart()
+  const { lines, totals, updateQty, removeItem, moveToWishlist, applyPromo, removePromo, getPromoError } = useCart()
   const { format, country, currency } = useCurrency()
   const [code, setCode] = useState('')
   const [codeError, setCodeError] = useState('')
@@ -101,7 +101,7 @@ export default function Cart() {
       setCode('')
       setCodeError('')
     } else {
-      setCodeError("That code isn't valid. Try ARIES10.")
+      setCodeError(getPromoError(code) ?? "That code isn't valid.")
       setShake((s) => s + 1)
     }
   }

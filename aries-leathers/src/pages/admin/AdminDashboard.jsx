@@ -1,22 +1,35 @@
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'motion/react'
-import { LayoutDashboard, Package, ShoppingBag } from 'lucide-react'
+import { motion } from 'motion/react'
+import { LayoutDashboard, Package, Percent, ShoppingBag, Ticket } from 'lucide-react'
 import Container from '../../components/ui/Container'
 import AdminOverview from '../../components/admin/AdminOverview'
 import AdminProducts from '../../components/admin/AdminProducts'
 import AdminOrders from '../../components/admin/AdminOrders'
+import AdminCoupons from '../../components/admin/AdminCoupons'
+import AdminSales from '../../components/admin/AdminSales'
 import { useAuth } from '../../hooks/useAuth'
+import { usePromotions } from '../../hooks/usePromotions'
+import { scheduleStatus } from '../../utils/promotions'
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'products', label: 'Products', icon: Package },
   { id: 'orders', label: 'Orders', icon: ShoppingBag },
+  { id: 'sales', label: 'Sales', icon: Percent },
+  { id: 'coupons', label: 'Coupons', icon: Ticket },
 ]
 
 export default function AdminDashboard() {
   const { user } = useAuth()
+  const { sales, coupons, now } = usePromotions()
   const [params, setParams] = useSearchParams()
   const tab = TABS.some((t) => t.id === params.get('tab')) ? params.get('tab') : 'overview'
+
+  // Tab par chhota number — kitni live hain
+  const liveCount = {
+    sales: sales.filter((s) => scheduleStatus(s, now) === 'active').length,
+    coupons: coupons.filter((c) => scheduleStatus(c, now) === 'active').length,
+  }
 
   return (
     <>
@@ -28,7 +41,7 @@ export default function AdminDashboard() {
             Signed in as {user.name}. Everything here is stored in this browser only.
           </p>
 
-          <nav className="mt-10 flex gap-1 overflow-x-auto" aria-label="Admin sections">
+          <nav className="mt-10 flex gap-1 overflow-x-auto" aria-label="Admin sections" data-lenis-prevent>
             {TABS.map(({ id, label, icon: Icon }) => {
               const active = tab === id
               return (
@@ -40,6 +53,11 @@ export default function AdminDashboard() {
                   }`}
                 >
                   <Icon size={15} strokeWidth={1.5} /> {label}
+                  {liveCount[id] > 0 && (
+                    <span className="grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[9px] font-bold text-ink">
+                      {liveCount[id]}
+                    </span>
+                  )}
                   {active && <motion.span layoutId="admin-tab" className="absolute inset-x-0 bottom-0 h-[2px] bg-gold-light" />}
                 </button>
               )
@@ -50,19 +68,11 @@ export default function AdminDashboard() {
 
       <section className="min-h-[60vh] bg-bone">
         <Container className="py-10 md:py-14">
-                   <AnimatePresence mode="wait">
-            <motion.div
-              key={tab}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {tab === 'overview' && <AdminOverview onNavigate={(t) => setParams({ tab: t }, { replace: true })} />}
-              {tab === 'products' && <AdminProducts />}
-              {tab === 'orders' && <AdminOrders />}
-            </motion.div>
-          </AnimatePresence>
+          {tab === 'overview' && <AdminOverview onNavigate={(t) => setParams({ tab: t }, { replace: true })} />}
+          {tab === 'products' && <AdminProducts />}
+          {tab === 'orders' && <AdminOrders />}
+          {tab === 'sales' && <AdminSales />}
+          {tab === 'coupons' && <AdminCoupons />}
         </Container>
       </section>
     </>

@@ -3,6 +3,7 @@
  * ------------------------------------------------------------
  * product.price = sabse chhote size ka price.
  * Har size ke hisaab se EXTRA amount judta hai.
+ * Agar product par sale chal rahi hai to extra amount par bhi utni hi % chhoot lagti hai.
  *
  * Kisi ek product ka apna rate chahiye to products.js mein us product mein likho:
  *   sizePrices:  { S: 0, M: 5, L: 10, XL: 15, Custom: 40 },   // extra USD
@@ -60,13 +61,14 @@ const CATEGORY_OVERRIDES = {
   trousers: { Custom: 30 },
 }
 
-/** Sirf extra amount (USD) */
+/** Sirf extra amount (USD) — sale ho to uske baad */
 export function getVariantExtra(product, { size, color } = {}) {
   if (!product) return 0
   const sizeMap = product.sizePrices ?? { ...DEFAULT_SIZE_EXTRAS, ...(CATEGORY_OVERRIDES[product.category] ?? {}) }
   const sizeExtra = size ? Number(sizeMap[size] ?? 0) : 0
   const colorExtra = color ? Number(product.colorPrices?.[color] ?? 0) : 0
-  return sizeExtra + colorExtra
+  const saleFactor = product.sale ? (100 - product.sale.percent) / 100 : 1
+  return Math.round((sizeExtra + colorExtra) * saleFactor * 100) / 100
 }
 
 /** Variation ka final price + mrp (USD) */

@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ShopContext } from './ShopContext'
 import { useProducts } from '../hooks/useProducts'
 import { useCurrency } from '../hooks/useCurrency'
+import { usePromotions } from '../hooks/usePromotions'
 import { readJSON, writeJSON } from '../utils/storage'
 import { roundForCurrency } from '../utils/currency'
 import { computeTotals } from '../utils/pricing'
 import { getVariantPrice } from '../utils/variantPrice'
-import { MAX_QTY, PROMO_CODES } from '../config/store'
+import { normalizeCode } from '../utils/promotions'
+import { MAX_QTY } from '../config/store'
 
 const CART_KEY = 'aries_cart'
 const WISHLIST_KEY = 'aries_wishlist'
@@ -17,7 +19,8 @@ const clampQty = (q) => Math.max(1, Math.min(MAX_QTY, q))
 
 export default function ShopProvider({ children }) {
   const { getProduct } = useProducts()
-  const { convert, currency } = useCurrency()
+  const { convert, format, currency } = useCurrency()
+  const { validateCoupon } = usePromotions()
 
   // Cart mein sirf IDs + options — price kabhi store nahi hota
   const [items, setItems] = useState(() => readJSON(CART_KEY, []))
@@ -52,15 +55,6 @@ export default function ShopProvider({ children }) {
     setPromoCode(null)
   }, [])
 
-  const applyPromo = useCallback((code) => {
-    const normalized = code.trim().toUpperCase()
-    if (!PROMO_CODES[normalized]) return false
-    setPromoCode(normalized)
-    return true
-  }, [])
-
-  const removePromo = useCallback(() => setPromoCode(null), [])
-
   const openCart = useCallback(() => setDrawerOpen(true), [])
   const closeCart = useCallback(() => setDrawerOpen(false), [])
 
@@ -92,9 +86,8 @@ export default function ShopProvider({ children }) {
     () =>
       items
         .map((i) => {
-          const product = getProduct(i.productId)
+          const product = getProduct(i.productId) // chal rahi sale pehle se lagi hoti hai
           if (!product) return null
-          // Size / colour ke hisaab se base (USD) price
           const { price: basePrice, extra: baseExtra } = getVariantPrice(product, { size: i.size, color: i.color })
           const unit = convert(basePrice) // pehle unit convert...
           return {
@@ -110,7 +103,44 @@ export default function ShopProvider({ children }) {
     [items, getProduct, convert, currency.code]
   )
 
-  const totals = useMemo(() => computeTotals(lines, currency.code, promoCode), [lines, currency.code, promoCode])
+  const subtotal = useMemo(
+    () => roundForCurrency(lines.reduce((sum, l) => sum + l.total, 0), currency.code),
+    [lines, currency.code]
+  )
+
+  // Lagaya hua code abhi bhi valid hai? (expire / minimum order / band — sab check)
+  const promoCheck = useMemo(
+    () => (promoCode ? validateCoupon(promoCode, { subtotal, convert, format }) : null),
+    [promoCode, validateCoupon, subtotal, convert, format]
+  )
+
+  const totals = useMemo(() => {
+    const t = computeTotals(lines, currency.code, promoCheck?.ok ? promoCheck.promo : null)
+    return { ...t, promoError: promoCheck && !promoCheck.ok ? promoCheck.error : null, pendingCode: promoCode }
+  }, [lines, currency.code, promoCheck, promoCode])
+
+  // ===== Promo actions =====
+  /** Code ka error message (ya null agar valid hai) */
+  const getPromoError = useCallback(
+    (code) => {
+      if (!code?.trim()) return 'Enter a promo code'
+      const res = validateCoupon(code, { subtotal, convert, format })
+      return res.ok ? null : res.error
+    },
+    [validateCoupon, subtotal, convert, format]
+  )
+
+  /** true agar code lag gaya */
+  const applyPromo = useCallback(
+    (code) => {
+      if (getPromoError(code)) return false
+      setPromoCode(normalizeCode(code))
+      return true
+    },
+    [getPromoError]
+  )
+
+  const removePromo = useCallback(() => setPromoCode(null), [])
 
   const wishlistProducts = useMemo(() => wishlist.map(getProduct).filter(Boolean), [wishlist, getProduct])
 
@@ -126,6 +156,7 @@ export default function ShopProvider({ children }) {
       clearCart,
       applyPromo,
       removePromo,
+      getPromoError,
       drawerOpen,
       openCart,
       closeCart,
@@ -136,7 +167,7 @@ export default function ShopProvider({ children }) {
       toggleWishlist,
       moveToWishlist,
     }),
-    [items, lines, totals, addItem, updateQty, removeItem, clearCart, applyPromo, removePromo, drawerOpen, openCart, closeCart, wishlist, wishlistProducts, isWishlisted, toggleWishlist, moveToWishlist]
+    [items, lines, totals, addItem, updateQty, removeItem, clearCart, applyPromo, removePromo, getPromoError, drawerOpen, openCart, closeCart, wishlist, wishlistProducts, isWishlisted, toggleWishlist, moveToWishlist]
   )
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>

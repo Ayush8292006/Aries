@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
+
 import { ArrowLeft, Banknote, Check, CreditCard, Loader2, Lock, MapPin, ShieldAlert, Truck } from 'lucide-react'
 import Container from '../../components/ui/Container'
 import Flag from '../../components/ui/Flag'
@@ -106,7 +107,7 @@ export default function Payment() {
   if (!draft?.address) return <Navigate to="/checkout" replace />
 
   const ship = SHIPPING_METHODS.find((m) => m.id === draft.shippingId) ?? SHIPPING_METHODS[0]
-  const finalTotals = computeTotals(lines, currency.code, totals.promo?.code ?? null, convert(ship.priceBase))
+    const finalTotals = computeTotals(lines, currency.code, totals.promo, convert(ship.priceBase))
   const a = draft.address
 
   const placeOrder = async () => {
