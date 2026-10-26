@@ -11,145 +11,129 @@ export default function ClotheslineHero() {
   const navigate = useNavigate()
   const [selected, setSelected] = useState(null)
 
-  const displayProducts = products.slice(0, 8)
+  // Infinite loop ke liye products ko duplicate kiya
+  const displayProducts = [...products.slice(0, 10), ...products.slice(0, 10)]
 
   return (
-    <section className="relative flex min-h-screen flex-col justify-between overflow-hidden bg-[#1a1a1a] pt-20 text-bone">
+    <section className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-[#1a1a1a] pt-28 text-bone md:pt-20">
       
       {/* Header */}
-      <div className="relative z-10 mx-auto mt-10 max-w-3xl px-6 text-center">
-        <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-bone/60">
+      <div className="relative z-10 mx-auto mt-4 max-w-3xl px-6 text-center md:mt-10">
+        <p className="text-[9px] font-medium uppercase tracking-[0.3em] text-bone/60 md:text-[10px]">
           New Collection — Premium Streetwear
         </p>
-        <h1 className="mt-4 font-display text-5xl leading-[1.1] tracking-tight text-white md:text-7xl">
-          Layers that hang right.
+        <h1 className="mt-3 font-display text-4xl leading-[1.1] tracking-tight text-white md:mt-4 md:text-6xl lg:text-7xl">
+          Leather that speaks for itself.
         </h1>
       </div>
 
-      {/* Clothesline Area */}
-      <div className="relative mt-20 flex w-full items-start justify-center pb-20">
+      {/* Clothesline Area (Products ko upar shift kiya) */}
+      <div className="relative mt-4 flex w-full items-start justify-center overflow-hidden pb-10 md:mt-10 md:pb-20">
         
-        {/* Rope */}
+        {/* Rope (SVG Curve) - Adjusted for new position */}
         <svg
-          className="absolute top-10 h-24 w-full min-w-[1200px]"
+          className="absolute top-[-20px] h-32 w-[200vw] min-w-[1200px] md:top-[-10px] md:w-[150vw]"
           viewBox="0 0 1200 100"
           preserveAspectRatio="none"
         >
-          <path
-            d="M 0 20 Q 600 120 1200 20"
-            fill="none"
-            stroke="#555"
-            strokeWidth="2.5"
-          />
+          <path d="M 0 20 Q 600 140 1200 20" fill="none" stroke="#444" strokeWidth="2.5" />
         </svg>
 
-        {/* Continuous left drift */}
+        {/* Infinite Loop Container */}
         <motion.div
-          className="relative z-10 mt-14 flex w-full max-w-[1400px] items-start justify-between px-4 md:px-10"
-          animate={{ x: [0, -80] }}                    // moves left
+          className="flex items-start"
+          animate={{ x: ['0%', '-50%'] }}
           transition={{
-            duration: 12,                              // ← change this for speed (lower = faster)
+            duration: 30, // Speed (kam karein toh tez chalega)
             ease: 'linear',
             repeat: Infinity,
             repeatType: 'loop'
           }}
         >
           {displayProducts.map((product, i) => {
-            const total = displayProducts.length - 1
-            const progress = i / total
-            const curveY = Math.sin(progress * Math.PI) * 60
-
-            const swingDelay = (i * 0.5) % 2.8
-            const swingDuration = 3.2 + (i % 3) * 0.35
+            const cycleIndex = i % 10
+            const progress = cycleIndex / 9 
+            // U-Shape (Parabola) Curve
+            const curveY = Math.sin(progress * Math.PI) * 50 
 
             return (
-              <motion.div
-                key={product.id}
-                className="relative flex cursor-pointer flex-col items-center origin-top"
+              <div
+                key={`${product.id}-${i}`}
+                className="relative mx-3 flex shrink-0 flex-col items-center cursor-pointer md:mx-6 origin-top"
                 style={{ top: curveY }}
-                initial={{ opacity: 0, y: -25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.8, ease: EASE }}
                 onClick={() => setSelected(product)}
-                whileHover={{ scale: 1.07, transition: { duration: 0.3 } }}
               >
-                {/* Natural swing */}
+                {/* Swing Animation */}
                 <motion.div
                   className="flex flex-col items-center"
-                  animate={{
-                    rotate: [2.8, -2.8, 2.8],
-                    y: [0, 5, 0]
-                  }}
+                  animate={{ rotate: [2, -2, 2] }}
                   transition={{
-                    duration: swingDuration,
+                    duration: 3 + (i % 3),
                     ease: 'easeInOut',
                     repeat: Infinity,
-                    delay: swingDelay
+                    delay: i * 0.2
                   }}
-                  whileHover={{
-                    rotate: [8, -8, 8],
-                    y: [0, 7, 0],
-                    transition: { duration: 1.6, ease: 'easeInOut', repeat: Infinity }
-                  }}
+                  whileHover={{ scale: 1.05, rotate: 0 }}
                 >
-                  {/* Hanger */}
-                  <div className="flex flex-col items-center">
+                  {/* Hanger (Thoda chhota kiya) */}
+                  <div className="flex flex-col items-center scale-75 md:scale-90">
                     <div className="h-6 w-px bg-white/30" />
                     <div className="h-3 w-3 rounded-full border border-white/40 bg-transparent" />
                     <div className="h-8 w-16 rounded-t-full border-t-2 border-white/50" />
-                    <div className="h-6 w-20" />
+                    <div className="h-4 w-20" /> {/* Gap kam kiya */}
                   </div>
 
-                  {/* Product */}
-                  <div className="group relative -mt-10 aspect-[3/4] w-[80px] overflow-hidden bg-[#2a2a2a] md:w-[120px] lg:w-[150px]">
+                  {/* Product Image (Upar shift kiya -mt-8 se) */}
+                  <div className="group relative -mt-6 aspect-[3/4] w-[90px] overflow-hidden bg-[#2a2a2a] md:-mt-8 md:w-[130px] lg:w-[160px]">
                     <img
                       src={product.images[0]}
                       alt={product.name}
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute right-0 top-2 border border-white/20 bg-ink px-2 py-0.5 text-[10px] text-bone shadow-sm">
+                    {/* Price Tag */}
+                    <div className="absolute right-0 top-2 border border-white/20 bg-ink px-1.5 py-0.5 text-[9px] text-bone shadow-sm md:px-2 md:text-[10px]">
                       ${product.price}
                     </div>
                   </div>
                 </motion.div>
-              </motion.div>
+              </div>
             )
           })}
         </motion.div>
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 flex w-full items-end justify-between px-8 pb-8">
-        <div>
-          <p className="text-sm font-medium text-bone">Sweatshirt</p>
-          <p className="text-xs text-bone/60">$165.00</p>
+      <div className="relative z-10 flex w-full flex-col gap-4 px-6 pb-6 md:flex-row md:items-end md:justify-between md:px-8 md:pb-8">
+        <div className="hidden md:block">
+          <p className="text-sm font-medium text-bone">The Aries Standard</p>
+          <p className="text-xs text-bone/60">Est. 1992</p>
         </div>
-        <div className="max-w-xs text-right">
-          <p className="text-xs leading-relaxed text-bone/80">
-            Crafted in heavyweight fleece.<br />
-            Cut oversized. Made to last.
+        <div className="text-center md:max-w-xs md:text-right">
+          <p className="text-[11px] leading-relaxed text-bone/80 md:text-xs">
+            Handcrafted in Mumbai.<br className="hidden md:block" />
+            Shipped worldwide.
           </p>
           <button
             onClick={() => navigate('/products')}
-            className="mt-4 border-b border-bone/50 pb-1 text-[11px] uppercase tracking-[0.2em] text-bone transition-colors hover:border-gold-light hover:text-gold-light"
+            className="mt-4 border-b border-bone/50 pb-1 text-[10px] uppercase tracking-[0.2em] text-bone transition-colors hover:border-gold-light hover:text-gold-light md:text-[11px]"
           >
             Shop the Collection
           </button>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Click Modal */}
       <AnimatePresence>
         {selected && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-6 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md md:p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelected(null)}
           >
             <motion.div
-              className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden border border-white/10 bg-[#1a1a1a] shadow-2xl md:flex-row"
+              className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-y-auto border border-white/10 bg-[#1a1a1a] shadow-2xl md:flex-row md:overflow-hidden"
               initial={{ scale: 0.85, y: 40, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.92, y: 20, opacity: 0 }}
@@ -163,7 +147,7 @@ export default function ClotheslineHero() {
                 <X size={20} />
               </button>
 
-              <div className="h-[50vh] w-full bg-[#2a2a2a] md:h-auto md:w-3/5">
+              <div className="h-[40vh] w-full shrink-0 bg-[#2a2a2a] md:h-auto md:w-3/5">
                 <img
                   src={selected.images[0]}
                   alt={selected.name}
@@ -171,21 +155,21 @@ export default function ClotheslineHero() {
                 />
               </div>
 
-              <div className="flex flex-col justify-center p-8 md:w-2/5 md:p-12">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-bone/50">
+              <div className="flex flex-col justify-center p-6 md:w-2/5 md:p-12">
+                <p className="text-[9px] uppercase tracking-[0.2em] text-bone/50 md:text-[10px]">
                   {selected.category}
                 </p>
-                <h2 className="mt-2 font-display text-3xl text-white">
+                <h2 className="mt-1 font-display text-2xl text-white md:mt-2 md:text-3xl">
                   {selected.name}
                 </h2>
-                <p className="mt-2 text-lg text-bone">${selected.price}</p>
-                <p className="mt-6 text-sm leading-relaxed text-bone/70">
+                <p className="mt-1 text-base text-bone md:mt-2 md:text-lg">${selected.price}</p>
+                <p className="mt-4 text-xs leading-relaxed text-bone/70 md:mt-6 md:text-sm">
                   {selected.description}
                 </p>
 
                 <button
                   onClick={() => navigate(`/products/${selected.id}`)}
-                  className="mt-8 flex w-full items-center justify-center gap-2 bg-bone py-4 text-[12px] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold hover:text-ink"
+                  className="mt-6 flex w-full items-center justify-center gap-2 bg-bone py-3 text-[11px] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold hover:text-ink md:mt-8 md:py-4 md:text-[12px]"
                 >
                   View Product <ArrowRight size={16} />
                 </button>
